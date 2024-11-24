@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/image/cat3.jng</file>
+        <file>resources/image/640.png</file>
+        <file>resources/image/Home_Background.png</file>
+    </qresource>
+</RCC>

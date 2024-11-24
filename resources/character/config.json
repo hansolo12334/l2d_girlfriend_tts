@@ -1,0 +1,17 @@
+{
+	"systemtray":	"icon.png",
+	"module":	[{
+			"name":	"LSS",
+			"window_x":	1659,
+			"window_y":	668 
+		}, {
+			"name":	"Hiyori",
+			"window_x":	1659,
+			"window_y":	668
+		}],
+	"userdata":	{
+		"current_model":	"Hiyori",
+		"top":	true,
+		"move":	true
+	}
+}
