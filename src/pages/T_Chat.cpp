@@ -201,8 +201,10 @@ void T_Chat::receiveTextEvent()
 
     QVBoxLayout *textLayoutBase = new QVBoxLayout();
     QHBoxLayout *textLayout = new QHBoxLayout();
+    QHBoxLayout *toolsLayout=new QHBoxLayout();
 
     ElaIconButton *audio_play_bt = new ElaIconButton(ElaIconType::Volume);
+
     audio_play_bt->setObjectName(QString::number(conversationTimes + 1));
     connect(audio_play_bt, &ElaIconButton::clicked, this, [=]() {
         QByteArray audioData;
@@ -214,14 +216,34 @@ void T_Chat::receiveTextEvent()
 
     });
 
+    ElaIconButton *audio_recreate_bt = new ElaIconButton(ElaIconType::RotateReverse);
+    audio_recreate_bt->setObjectName("audioRecreatBt_"+QString::number(conversationTimes + 1));
+    connect(audio_recreate_bt, &ElaIconButton::clicked, this, [=]() {
+        QString conversationIdx = audio_recreate_bt->objectName();
+        QStringList temp = conversationIdx.split("_");
+        QString data;
+        qDebug() << temp[1];
+        bool re = history_storage::instance().readConversationString(temp[1], data);
+        if(re){
+            qDebug() << "重新生成当前回复内容tts: " << data;
+            send_requests_to_tts(data);
+        }
+
+    });
 
     textLayout->setAlignment(Qt::AlignLeft);
     textLayout->addWidget(chatBubble);
 
     textLayout->addStretch();
 
+    toolsLayout->addWidget(audio_recreate_bt);
+    toolsLayout->addWidget(audio_play_bt);
+    toolsLayout->addStretch();
+
+
     textLayoutBase->addLayout(textLayout);
-    textLayoutBase->addWidget(audio_play_bt);
+    textLayoutBase->addLayout(toolsLayout);
+
     // textArea->setFixedHeight(50);
     // cardScrollAreaWidgetLayout->setAlignment(Qt::AlignRight);
 
@@ -238,30 +260,24 @@ void T_Chat::receiveTextEvent()
 }
 
 
-void T_Chat::send_requests_to_tts()
+void T_Chat::send_requests_to_tts(QString data)
 {
     if (!AppConfig::instance().isEnableTTS())
     {
         return;
     }
 
-    // QString currentString = plainTextEdit2->toPlainText();
-    // if (received_txt==plainTextEdit2->toPlainText()){
-    //     qDebug() << "未变化 播放旧音频";
-    //     playAudio(response_data);
-    //     return;
-    // }
 
-    qDebug() << "send to ollama!";
+    qDebug() << "send to tts!";
     ServeTTSRequest request;
 
-    request.text = current_receiveText->text().remove("\\r").remove("\\n");
+    request.text = data.remove("\\r").remove("\\n");
     // qDebug() << "request.text " << request.text;
     // "合成所需的音频并流式返回";
 
     // request.references.append(ServeReferenceAudio("audio1", "text1"));
     // request.references.append(ServeReferenceAudio("audio2", "text2"));
-    request.reference_id = "1";
+    request.reference_id = QString::number(AppConfig::instance().getTTsVoiceChoise());
     request.normalize = true;
     request.format = "wav";
     request.mp3_bitrate = 64;
@@ -322,7 +338,7 @@ bool T_Chat::send_requests_to_tts_after_ollama_auto()
     qDebug() << "request.text " << request.text;
     // request.references.append(ServeReferenceAudio("audio1", "text1"));
     // request.references.append(ServeReferenceAudio("audio2", "text2"));
-    request.reference_id = "3";
+    request.reference_id = QString::number(AppConfig::instance().getTTsVoiceChoise());
     request.normalize = true;
     request.format = "wav";
     request.mp3_bitrate = 64;
@@ -459,11 +475,32 @@ void T_Chat::parseResponse(QNetworkReply *reply)
 
     receiving_txt = "";
     connect(reply, &QNetworkReply::readyRead, this, [this, reply]() {
+        // static QByteArray buffer;
+        // buffer.append(reply->readAll());
+        // QJsonDocument jsonResponse = QJsonDocument::fromJson(buffer);
+        // if (!jsonResponse.isNull() && jsonResponse.isObject())
+        // {
+        //     QJsonObject jsonObject = jsonResponse.object();
+        //     if (jsonObject.contains("message") && jsonObject["message"].isObject())
+        //     {
+        //         QJsonObject messageObject = jsonObject["message"].toObject();
+        //         if (messageObject.contains("content") && messageObject["content"].isString())
+        //         {
+        //             QString content = messageObject["content"].toString();
+        //             receiving_txt += content;
+        //             current_receiveText->clear();
+        //             // current_receiveText->setText(receiving_txt.remove("\\r").remove("\n"));
+        //         }
+        //     }
+        // }
+
+        //旧方法
         static QByteArray buffer;
         buffer.append(reply->readAll());
-
         while (true)
         {
+
+            //旧方法
             int endIndex = buffer.indexOf('\n');
             if (endIndex == -1)
             {
@@ -489,8 +526,8 @@ void T_Chat::parseResponse(QNetworkReply *reply)
                     {
                         QString content = messageObject["content"].toString();
                         receiving_txt += content;
-                        // qDebug() << "Parsed content:" << receiving_txt;
-                        current_receiveText->clear();
+                       // qDebug() << "Parsed content:" << receiving_txt;
+                        // current_receiveText->clear();
                         // qDebug() << current_receiveText;
                         // current_receiveText->setText(receiving_txt.remove("\\r").remove("\n"));
 
@@ -507,7 +544,7 @@ void T_Chat::parseResponse(QNetworkReply *reply)
 
         if (reply->atEnd())
         {
-            qDebug() << "***********************done";
+            qDebug() << "->>>>>>>>>receivedone";
             // 处理完成后的逻辑
             // ui->start_talk->setEnabled(true);
             // emit startClicked();

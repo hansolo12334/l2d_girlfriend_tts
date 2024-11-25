@@ -80,7 +80,9 @@ void main_window::init_content()
 
     this->addPageNode("CHAT", _chatPage, ElaIconType::PeopleArrows);
 
-    this->addFooterNode("Setting", _settingPage, _settingKey, 0, ElaIconType::GearComplex);
+    this->addPageNode("Setting", _settingPage, ElaIconType::GearComplex);
+
+    // this->addFooterNode("Setting", _settingPage, _settingKey, 0, ElaIconType::GearComplex);
 
     connect(&AppConfig::instance(), &AppConfig::configChanged, this, [=]() {
         if (AppConfig::instance().isEnableTTS())

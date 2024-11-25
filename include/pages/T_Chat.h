@@ -50,7 +50,7 @@ private:
     QAudioSink *audio = nullptr;
 
 public:
-    void send_requests_to_tts();
+    void send_requests_to_tts(QString data);
     bool send_requests_to_ollama();
     bool send_requests_to_tts_after_ollama_auto();
 

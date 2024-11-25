@@ -70,6 +70,39 @@ public:
         return true;
     }
 
+    bool readConversationString(const QString &conversationId,QString &data)
+    {
+        if (!db.isOpen() && !db.open())
+        {
+            qDebug() << "无法打开数据库:" << db.lastError().text();
+            return false;
+        }
+
+        QSqlQuery query;
+        query.prepare(
+            "SELECT conversationContent FROM audio_history WHERE conversation_id = :conversation_id ORDER BY timestamp");
+        query.bindValue(":conversation_id", conversationId);
+        if (!query.exec())
+        {
+            qDebug() << "查询数据失败:" << query.lastError().text();
+            return false;
+        }
+
+        QString conversationContent{};
+        while (query.next())
+        {
+            conversationContent = query.value(0).toString();
+        }
+
+        if (conversationContent.isEmpty())
+        {
+            qDebug() << "未找到对应的对话";
+            return false;
+        }
+        data=conversationContent;
+        return true;
+    }
+
     bool readAudioData(const QString &conversationId, QByteArray &audioData)
     {
         if (!db.isOpen() && !db.open())

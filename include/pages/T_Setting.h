@@ -1,6 +1,8 @@
 #ifndef T_SETTING_H
 #define T_SETTING_H
 
+#include<QProcess>
+
 #include "T_BasePage.h"
 class ElaRadioButton;
 class ElaToggleSwitch;
@@ -21,8 +23,15 @@ private:
     ElaRadioButton* _maximumButton{nullptr};
     ElaRadioButton* _autoButton{nullptr};
 
+    QProcess *tts_progress{nullptr};
+    QProcess *ollama_progress{nullptr};
+
 public:
     ElaToggleSwitch *_enableTTsButton{nullptr};
+
+public:
+    void open_tts_bat(bool enable,QString bat_path);
+    void open_ollama(bool enable);
 };
 
 #endif // T_SETTING_H
