@@ -6,7 +6,7 @@
  */
 
 #pragma once
-#include "../gl_widget/glwidget.h"
+#include "../glwidget.h"
 #include "LAppAllocator.hpp"
 
 class LAppView;

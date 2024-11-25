@@ -11,6 +11,7 @@
 #include <QTemporaryFile>
 #include <QAudioSink>
 
+#include"T_ChatBubble.h"
 class T_Chat : public T_BasePage
 {
  Q_OBJECT
@@ -50,13 +51,13 @@ private:
 
 public:
     void send_requests_to_tts();
-    void send_requests_to_ollama();
-    void send_requests_to_tts_after_ollama_auto();
+    bool send_requests_to_ollama();
+    bool send_requests_to_tts_after_ollama_auto();
 
     void receiveTextEvent();
 
-    ElaText *current_receiveText = nullptr;
-    ElaText *current_sendText = nullptr;
+    T_ChatBubble *current_receiveText = nullptr;
+    T_ChatBubble *current_sendText = nullptr;
     QMap<int, ElaText *> receiveTexts;
     int conversationTimes = 0;
 };

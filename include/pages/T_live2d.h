@@ -1,15 +1,15 @@
 #ifndef T_LIVE2D_H
 #define T_LIVE2D_H
 
-#include "gl_widget/glwidget.h"
+#include "glwidget.h"
 
-#include<QHBoxLayOut>
-#include<QVBoxLayOut>
+#include <QHBoxLayOut>
+#include <QVBoxLayOut>
 
 
 class T_live2d : public QWidget
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     T_live2d(QWidget *parent = nullptr);
     ~T_live2d();

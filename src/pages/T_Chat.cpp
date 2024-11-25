@@ -24,6 +24,8 @@
 #include "ElaScrollPageArea.h"
 #include "ElaText.h"
 
+#include  "T_ChatBubble.h"
+
 #include "app_config.h"
 #include "history_storage.h"
 
@@ -60,6 +62,8 @@ T_Chat::T_Chat(QWidget *parent) : T_BasePage(parent)
 
     text_input_edit = new ElaLineEdit(this);
     text_input_edit->setFixedHeight(30);
+
+    connect(text_input_edit, &ElaLineEdit::returnPressed, this, &T_Chat::inputTextEvent);
 
     ElaPushButton *sendButton = new ElaPushButton(this);
     ElaPushButton *recevButton = new ElaPushButton(this);
@@ -120,17 +124,28 @@ void T_Chat::inputTextEvent()
     userCard->setPixmap(image.scaled(50, 50, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     userCard->setStyleSheet("background-color:transparent;");
 
-    ElaText *textText = new ElaText(text_input_edit->text(), this);
-    textText->setMaximumWidth(300);
-    textText->setWordWrap(true);
-    textText->setTextPixelSize(15);
-    textText->setAlignment(Qt::AlignLeft);
-    textText->setStyleSheet("background-color: rgba(128, 128, 128, 20);"); // 设置半透明灰色背景
+    // ElaText *textText = new ElaText(text_input_edit->text(), this);
+    // textText->setMaximumWidth(300);
+    // textText->setWordWrap(false);
+    // textText->setTextPixelSize(15);
+    // textText->setAlignment(Qt::AlignLeft);
+    // textText->setStyleSheet("background-color: rgba(128, 128, 128, 20);"); // 设置半透明灰色背景
+
+    //测试气泡
+    T_ChatBubble *chatBubble = new T_ChatBubble();
+    chatBubble->setText(text_input_edit->text());
+    chatBubble->setTextPixelSize(15);
+    chatBubble->setMaximumWidth(300);
+    chatBubble->setWordWrap(false);
+    // chatBubble->resize(60, 30);
 
     QHBoxLayout *textLayout = new QHBoxLayout();
     textLayout->addStretch();
     textLayout->setAlignment(Qt::AlignRight);
-    textLayout->addWidget(textText);
+
+
+
+    textLayout->addWidget(chatBubble);
     textLayout->addWidget(userCard);
     // textLayout->addStretch();
 
@@ -141,21 +156,23 @@ void T_Chat::inputTextEvent()
     // cardScrollAreaWidgetLayout->insertWidget(cardScrollAreaWidgetLayout->count() - 1, textArea);
 
     // cardScrollArea->verticalScrollBar()
+    QCoreApplication::processEvents();
     QScrollBar *vScrollBar = cardScrollArea->verticalScrollBar();
     vScrollBar->setValue(vScrollBar->maximum());
 
-    // text_input_edit->clear();
+
+    text_input_edit->clear();
     //保存当前文本指针
-    current_sendText = textText;
+    current_sendText = chatBubble;
 
 
     //然后发送到ollama
-    send_requests_to_ollama();
+    bool send_state=send_requests_to_ollama();
 }
 
 void T_Chat::receiveTextEvent()
 {
-    if (text_input_edit->text().size() <= 0)
+    if (current_sendText->text().size() <= 0)
     {
         return;
     }
@@ -166,13 +183,20 @@ void T_Chat::receiveTextEvent()
     // textArea->setStyleSheet("background-color:transparent;");
     // textArea->setMaximumWidth(500);
 
-    ElaText *textText = new ElaText("", this);
-    textText->setMaximumWidth(300);
-    textText->setWordWrap(false);
-    textText->setTextPixelSize(15);
-    textText->setWordWrap(true);
-    textText->setAlignment(Qt::AlignLeft);
-    textText->setStyleSheet("background-color: rgba(128, 128, 128, 60);"); // 设置半透明灰色背景
+    // ElaText *textText = new ElaText("", this);
+    // textText->setMaximumWidth(300);
+    // textText->setWordWrap(false);
+    // textText->setTextPixelSize(15);
+    // textText->setWordWrap(true);
+    // textText->setAlignment(Qt::AlignLeft);
+    // textText->setStyleSheet("background-color: rgba(128, 128, 128, 60);"); // 设置半透明灰色背景
+
+    //测试气泡
+    T_ChatBubble *chatBubble = new T_ChatBubble();
+    chatBubble->setText("");
+    chatBubble->setTextPixelSize(15);
+    chatBubble->setMaxWidth(200);
+    // chatBubble->setWordWrap(false);
 
 
     QVBoxLayout *textLayoutBase = new QVBoxLayout();
@@ -183,13 +207,16 @@ void T_Chat::receiveTextEvent()
     connect(audio_play_bt, &ElaIconButton::clicked, this, [=]() {
         QByteArray audioData;
         QString conversationIdx = audio_play_bt->objectName();
-        history_storage::instance().readAudioData(conversationIdx, audioData);
-        playAudio(audioData);
+        bool re=history_storage::instance().readAudioData(conversationIdx, audioData);
+        if(re){
+            playAudio(audioData);
+        }
+
     });
 
 
     textLayout->setAlignment(Qt::AlignLeft);
-    textLayout->addWidget(textText);
+    textLayout->addWidget(chatBubble);
 
     textLayout->addStretch();
 
@@ -201,13 +228,13 @@ void T_Chat::receiveTextEvent()
 
     cardScrollAreaWidgetLayout->insertLayout(cardScrollAreaWidgetLayout->count() - 1, textLayoutBase);
 
-
+    QCoreApplication::processEvents();
     // cardScrollArea->verticalScrollBar()
     QScrollBar *vScrollBar = cardScrollArea->verticalScrollBar();
     vScrollBar->setValue(vScrollBar->maximum());
 
     //保存当前文本指针
-    current_receiveText = textText;
+    current_receiveText = chatBubble;
 }
 
 
@@ -228,8 +255,8 @@ void T_Chat::send_requests_to_tts()
     qDebug() << "send to ollama!";
     ServeTTSRequest request;
 
-    request.text = current_receiveText->text();
-    qDebug() << "request.text " << request.text;
+    request.text = current_receiveText->text().remove("\\r").remove("\\n");
+    // qDebug() << "request.text " << request.text;
     // "合成所需的音频并流式返回";
 
     // request.references.append(ServeReferenceAudio("audio1", "text1"));
@@ -285,14 +312,14 @@ void T_Chat::send_requests_to_tts()
     reply->deleteLater();
 }
 
-void T_Chat::send_requests_to_tts_after_ollama_auto()
+bool T_Chat::send_requests_to_tts_after_ollama_auto()
 {
     ServeTTSRequest request;
 
 
-    request.text = current_receiveText->text().remove("\\s");
+    request.text = current_receiveText->text().remove("\\r").remove("\\n");
     // "合成所需的音频并流式返回";
-
+    qDebug() << "request.text " << request.text;
     // request.references.append(ServeReferenceAudio("audio1", "text1"));
     // request.references.append(ServeReferenceAudio("audio2", "text2"));
     request.reference_id = "3";
@@ -338,6 +365,9 @@ void T_Chat::send_requests_to_tts_after_ollama_auto()
     {
         int status = statusCode.toInt();
         qDebug() << "Status Code:" << status;
+    }else{
+        qDebug() << "未收到tts数据";
+        return false;
     }
     qDebug() << "playAudio:";
     playAudio(response_data);
@@ -351,9 +381,11 @@ void T_Chat::send_requests_to_tts_after_ollama_auto()
     AppConfig::instance().saveSettings();
     // received_txt = plainTextEdit2->toPlainText();
     reply->deleteLater();
+
+    return true;
 }
 
-void T_Chat::send_requests_to_ollama()
+bool T_Chat::send_requests_to_ollama()
 {
 
     received_txt = "";
@@ -387,6 +419,7 @@ void T_Chat::send_requests_to_ollama()
     QEventLoop loop; //使用 QEventLoop 阻塞 等待请求完成
     QNetworkReply *reply = manager->post(netWorkRequest, requestJsonDoc.toJson());
 
+
     qDebug() << "posted!";
 
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
@@ -399,13 +432,25 @@ void T_Chat::send_requests_to_ollama()
     parseResponse(reply);
 
     loop.exec();
+    current_receiveText->setText(receiving_txt.remove("\\r").remove("\n"));
 
     if (!AppConfig::instance().isEnableTTS())
     {
-        return;
+        return true;
     }
+    if(receiving_txt.size()<=1){
+        qDebug() << "未成功收到ollam消息";
+        current_receiveText->setText("未连接。。。");
+        return false;
+    }
+
     qDebug() << "收到回复 自动转tts。。。";
-    send_requests_to_tts_after_ollama_auto();
+
+    if(!send_requests_to_tts_after_ollama_auto()){
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -446,8 +491,8 @@ void T_Chat::parseResponse(QNetworkReply *reply)
                         receiving_txt += content;
                         // qDebug() << "Parsed content:" << receiving_txt;
                         current_receiveText->clear();
-                        qDebug() << current_receiveText;
-                        current_receiveText->setText(receiving_txt.remove("\\s"));
+                        // qDebug() << current_receiveText;
+                        // current_receiveText->setText(receiving_txt.remove("\\r").remove("\n"));
 
                         // 在这里可以使用content变量，例如更新UI
                         // ui->text_talk->setText(ui->text_talk->toPlainText() + content);

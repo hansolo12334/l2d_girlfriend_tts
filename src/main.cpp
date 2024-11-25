@@ -24,8 +24,8 @@ int main(int argc,char **argv)
 
 
     main_window w;
-    w.show();
+    // w.show();
 
-
+    QApplication::setQuitOnLastWindowClosed(false);
     return a.exec();
 }
