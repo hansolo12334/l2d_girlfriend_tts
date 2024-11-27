@@ -1,10 +1,18 @@
-﻿#include "cJSON.h"
-#include "qf_log.h"
+﻿#include<QJsonDocument>
+#include<QJsonObject>
+#include<QJsonArray>
+#include<QFile>
+
+#include "cJSON.h"
+#include "app_log.h"
+
 #include <stdio.h>
 #include <string.h>
 #include "resource_loader.hpp"
 #include "message_queue.hpp"
 #include "event_handler.hpp"
+
+
 #define  CONFIG_JSON_FILE_PATH  "Resources/config.json"
 namespace
 {
@@ -15,22 +23,79 @@ bool resource_loader::initialize()
 {
     if( is_init == true)
     {
-        QF_LOG_ERROR("initialize finished");
+        APP_LOG_ERROR("initialize finished");
         return true;
     }
 
+    //测试
+    QFile file(CONFIG_JSON_FILE_PATH);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        APP_LOG_ERROR("无法打开Json文件进行读取: "<< CONFIG_JSON_FILE_PATH);
+        return false;
+    }
+    QByteArray json_file = file.readAll();
+    file.close();
+    if(json_file.size()>=config_file_size){
+        APP_LOG_ERROR("Json文件太大");
+    }
+
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(json_file);
+    if (!jsonDoc.isNull() && jsonDoc.isObject())
+    {
+        QJsonObject jsonObject = jsonDoc.object();
+        if (jsonObject.contains("systemtray") && jsonObject["systemtray"].isString()){
+            APP_LOG_DEBUG("systemtray "<<jsonObject["systemtray"].toString());
+        }
+
+        if(jsonObject.contains("module") && jsonObject["module"].isArray()){
+            QJsonArray modules = jsonObject["module"].toArray();
+            for(const QJsonValue &moduleValue : modules){
+                if(moduleValue.isObject()){
+                    QJsonObject module = moduleValue.toObject();
+                    if(module.contains("name")&&module["name"].isString()){
+                        APP_LOG_DEBUG("name " << module["name"].toString());
+                    }
+                    if(module.contains("window_x")&&module["window_x"].isDouble()){
+                        APP_LOG_DEBUG("window_x " << module["window_x"].toInt());
+                    }
+                    if(module.contains("window_y")&&module["window_y"].isDouble()){
+                        APP_LOG_DEBUG("window_y " << module["window_y"].toInt());
+                    }
+                }
+            }
+        }
+
+        if(jsonObject.contains("userdata") && jsonObject["userdata"].isObject()){
+            QJsonObject userdata = jsonObject["userdata"].toObject
+            ();
+            if (userdata.contains("current_model") && userdata["current_model"].isString()) {
+            APP_LOG_DEBUG("Current model: " << userdata["current_model"].toString());
+            }
+            if (userdata.contains("top") && userdata["top"].isBool()) {
+                APP_LOG_DEBUG("Top: " << userdata["top"].toBool());
+            }
+            if (userdata.contains("move") && userdata["move"].isBool()) {
+                APP_LOG_DEBUG("Move: " << userdata["move"].toBool());
+            }
+        }
+    }
+
+
+
+    //
     FILE* fd;
     fopen_s(&fd,CONFIG_JSON_FILE_PATH,"r");
     if(fd == NULL)
     {
-        QF_LOG_ERROR("open file fail:%s",CONFIG_JSON_FILE_PATH);
+        APP_LOG_ERROR("open file fail: "<<CONFIG_JSON_FILE_PATH);
         return false;
     }
     fseek(fd,0,SEEK_END);
     int file_size = ftell(fd);
     if(file_size >= config_file_size)
     {
-        QF_LOG_ERROR("config file is to large");
+        APP_LOG_ERROR("config file is to large");
         fclose(fd);
         return false;
     }
@@ -42,7 +107,7 @@ bool resource_loader::initialize()
     cJSON* root = cJSON_Parse(buffer);
     if(root == NULL)
     {
-        QF_LOG_ERROR("parse fail:%s",buffer);
+        APP_LOG_ERROR("parse fail: "<<buffer);
         fclose(fd);
         return false;
     }
@@ -169,7 +234,7 @@ void resource_loader::release()
     char* new_config = cJSON_Print((cJSON*)json_root);
     event_handler::get_instance().report(event_handler::event_type::app_config_change,new_config);
     cJSON_Delete((cJSON*)json_root);
-    QF_LOG_INFO("release");
+    APP_LOG_INFO("release");
     is_init = false;
 }
 const std::vector<resource_loader::model>& resource_loader::get_model_list()
@@ -308,7 +373,7 @@ bool resource_loader::update_current_model_position(int x,int y)
         if(node!=NULL&&cJSON_IsArray(node))
         {
             int index = current_model-&model_list[0];
-            //QF_LOG_INFO("index:%d",index);
+            //APP_LOG_INFO("index: "<<index);
             cJSON* model_ptr=cJSON_GetArrayItem(node,index);
             if(model_ptr!=NULL&&cJSON_IsObject(model_ptr))
             {
@@ -317,7 +382,8 @@ bool resource_loader::update_current_model_position(int x,int y)
                 {
                     if(strncmp(cJSON_GetStringValue(tmp_value),(char*)current_model->name,resource_name_size) != 0)
                     {
-                        QF_LOG_ERROR("%s,%s",cJSON_GetStringValue(tmp_value),(char*)current_model->name);
+                        // APP_LOG_ERROR("%s,%s",cJSON_GetStringValue(tmp_value),(char*)current_model->name);
+                        APP_LOG_ERROR(cJSON_GetStringValue(tmp_value)<<", "<<(char*)current_model->name);
                         break;
                     }
                 }

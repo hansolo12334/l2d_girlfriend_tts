@@ -1,8 +1,9 @@
 ﻿#include "message_queue.hpp"
 #include <assert.h>
 #include <stdint.h>
-#include "qf_log.h"
-namespace 
+#include "app_log.h"
+#include"event_handler.hpp"
+namespace
 {
     constexpr int message_max_size = 32;
     constexpr int message_max_count = 64;
@@ -24,7 +25,7 @@ msg_queue::msg_queue()
 msg_queue::status msg_queue::initialize(int _size, int _max_count) {
     if(is_init == true)
     {
-        QF_LOG_INFO("have been initialized");
+        APP_LOG_INFO("have been initialized");
         return msg_queue::status::success;
     }
 
@@ -88,9 +89,11 @@ msg_queue::status msg_queue::initialize(int _size, int _max_count) {
 
 msg_queue::status msg_queue::post(void* data)
 {
-    if(is_init == false)
+
+
+    if (is_init == false)
     {
-        QF_LOG_INFO("not initialized");
+        APP_LOG_INFO("not initialized");
         return msg_queue::status::error;
     }
 
@@ -119,7 +122,7 @@ msg_queue::status msg_queue::get(void* data)
 {
     if(is_init == false)
     {
-        QF_LOG_INFO("not initialized");
+        APP_LOG_INFO("not initialized");
         return msg_queue::status::error;
     }
 
@@ -159,7 +162,7 @@ void msg_queue::release()
         msg_queue* data;
         while (available_block < max_count)
         {
-            QF_LOG_INFO("message release");
+            APP_LOG_INFO("message release");
             if (available_block == 0)
             {
                 data = (msg_queue*)(buffer + first_block * algin_block_size);
@@ -180,7 +183,7 @@ void msg_queue::release()
     delete[] (uint8_t*)buffer;
     delete mut;
     delete cond;
-    QF_LOG_INFO("release success");
+    APP_LOG_INFO("release success");
 }
 msg_queue::~msg_queue()
 {

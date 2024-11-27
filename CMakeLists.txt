@@ -128,6 +128,7 @@ if(ELAWIDGETTOOLS_FOUND)
 endif ()
 set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
 
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DAPP_DEBUG")
 include_directories(include)
 include_directories(${GLEW_PATH}/include)
 include_directories(Framework/src)
@@ -200,3 +201,8 @@ add_custom_command(
     ${CMAKE_COMMAND} -E
       copy_directory ${RES_PATH} $<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources
 )
+
+
+
+
+# cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE --no-warn-unused-cli -SD:/Qt_project/2024/l2d_girlfriend_tts -Bd:/Qt_project/2024/l2d_girlfriend_tts/build -G "Visual Studio 16 2019" -T host=x64 -A x64

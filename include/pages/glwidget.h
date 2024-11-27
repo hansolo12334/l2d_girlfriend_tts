@@ -5,6 +5,9 @@
 // #include <QGLWidget>
 #include <QOpenGLWidget>
 #include <QTimer>
+#include <QMouseEvent>
+#include <QCloseEvent>
+#include<QEnterEvent>
 
 class GLWidget : public QOpenGLWidget
 {
@@ -13,6 +16,10 @@ class GLWidget : public QOpenGLWidget
 public:
     GLWidget(QWidget *parent = 0);
     ~GLWidget();
+private:
+    QPoint global_pos{0,0};
+    bool outSideL2d = true;
+
 protected:
     void initializeGL();
     void paintGL();
@@ -22,6 +29,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void timerEvent(QTimerEvent *event) override;
     void closeEvent(QCloseEvent * e) override;
+    void enterEvent(QEnterEvent *event) override;
+    void leaveEvent(QEvent *event) override;
 };
 
 #endif

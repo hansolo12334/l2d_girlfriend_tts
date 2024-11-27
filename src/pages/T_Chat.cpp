@@ -105,7 +105,7 @@ void T_Chat::inputTextEvent()
     {
         return;
     }
-    qDebug() << "发送~";
+    APP_LOG_DEBUG("发送~");
     // ElaText *homeCard = new ElaText(cardScrollArea);
 
     // ElaScrollPageArea *textArea = new ElaScrollPageArea(this);
@@ -176,7 +176,7 @@ void T_Chat::receiveTextEvent()
     {
         return;
     }
-    qDebug() << "创建回复气泡";
+    APP_LOG_DEBUG("创建回复气泡");
     // ElaText *homeCard = new ElaText(cardScrollArea);
 
     // ElaScrollPageArea *textArea = new ElaScrollPageArea(this);
@@ -222,10 +222,10 @@ void T_Chat::receiveTextEvent()
         QString conversationIdx = audio_recreate_bt->objectName();
         QStringList temp = conversationIdx.split("_");
         QString data;
-        qDebug() << temp[1];
+        APP_LOG_DEBUG(temp[1]);
         bool re = history_storage::instance().readConversationString(temp[1], data);
         if(re){
-            qDebug() << "重新生成当前回复内容tts: " << data;
+            APP_LOG_DEBUG("重新生成当前回复内容tts: " << data);
             send_requests_to_tts(data);
         }
 
@@ -268,7 +268,8 @@ void T_Chat::send_requests_to_tts(QString data)
     }
 
 
-    qDebug() << "send to tts!";
+
+    APP_LOG_DEBUG("send to tts!");
     ServeTTSRequest request;
 
     request.text = data.remove("\\r").remove("\\n");
@@ -309,7 +310,8 @@ void T_Chat::send_requests_to_tts(QString data)
     QEventLoop loop; //使用 QEventLoop 阻塞 等待请求完成
     QNetworkReply *reply = manager->post(netWorkRequest, requestJsonDoc.toJson());
 
-    qDebug() << "posted!";
+
+    APP_LOG_DEBUG("posted!");
 
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
@@ -319,7 +321,7 @@ void T_Chat::send_requests_to_tts(QString data)
     if (statusCode.isValid())
     {
         int status = statusCode.toInt();
-        qDebug() << "Status Code:" << status;
+        APP_LOG_DEBUG("Status Code:" << status);
     }
     playAudio(response_data);
 
@@ -330,12 +332,28 @@ void T_Chat::send_requests_to_tts(QString data)
 
 bool T_Chat::send_requests_to_tts_after_ollama_auto()
 {
+
+    if (!AppConfig::instance().isEnableTTS())
+    {
+        //无音频保存当前对话
+        APP_LOG_DEBUG("无音频保存当前对话 " << conversationTimes);
+        conversationTimes++;
+        history_storage::instance().saveConversationData(response_data,
+                                                    QString::number(conversationTimes),
+                                                    current_receiveText->text(),
+                                                    current_sendText->text(),
+                                                    false);
+        AppConfig::instance().setConversationTimes(conversationTimes);
+        AppConfig::instance().saveSettings();
+        return true;
+    }
+
     ServeTTSRequest request;
 
 
     request.text = current_receiveText->text().remove("\\r").remove("\\n");
     // "合成所需的音频并流式返回";
-    qDebug() << "request.text " << request.text;
+    APP_LOG_DEBUG("request.text " << request.text);
     // request.references.append(ServeReferenceAudio("audio1", "text1"));
     // request.references.append(ServeReferenceAudio("audio2", "text2"));
     request.reference_id = QString::number(AppConfig::instance().getTTsVoiceChoise());
@@ -370,7 +388,8 @@ bool T_Chat::send_requests_to_tts_after_ollama_auto()
     QEventLoop loop; //使用 QEventLoop 阻塞 等待请求完成
     QNetworkReply *reply = manager->post(netWorkRequest, requestJsonDoc.toJson());
 
-    qDebug() << "posted!";
+
+    APP_LOG_DEBUG("posted");
 
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
@@ -380,19 +399,21 @@ bool T_Chat::send_requests_to_tts_after_ollama_auto()
     if (statusCode.isValid())
     {
         int status = statusCode.toInt();
-        qDebug() << "Status Code:" << status;
+        APP_LOG_DEBUG("Status Code:" << status);
     }else{
-        qDebug() << "未收到tts数据";
+        APP_LOG_ERROR("未收到tts数据");
         return false;
     }
-    qDebug() << "playAudio:";
+    APP_LOG_DEBUG("playAudio...");
     playAudio(response_data);
 
     //保存数据
     conversationTimes++;
-    history_storage::instance().saveAudioData(response_data,
+    history_storage::instance().saveConversationData(response_data,
                                               QString::number(conversationTimes),
-                                              current_receiveText->text());
+                                              current_receiveText->text(),
+                                              current_sendText->text(),
+                                              true);
     AppConfig::instance().setConversationTimes(conversationTimes);
     AppConfig::instance().saveSettings();
     // received_txt = plainTextEdit2->toPlainText();
@@ -405,7 +426,8 @@ bool T_Chat::send_requests_to_ollama()
 {
 
     received_txt = "";
-    qDebug() << "clicked!";
+
+    APP_LOG_DEBUG("clicked!");
     OllamaRequest request;
     request.model = "qwen2-rp";
     request.stream = true;
@@ -436,7 +458,7 @@ bool T_Chat::send_requests_to_ollama()
     QNetworkReply *reply = manager->post(netWorkRequest, requestJsonDoc.toJson());
 
 
-    qDebug() << "posted!";
+    APP_LOG_DEBUG("posted!");
 
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     //
@@ -455,12 +477,12 @@ bool T_Chat::send_requests_to_ollama()
         return true;
     }
     if(receiving_txt.size()<=1){
-        qDebug() << "未成功收到ollam消息";
+        APP_LOG_ERROR("未成功收到ollam消息");
         current_receiveText->setText("未连接。。。");
         return false;
     }
 
-    qDebug() << "收到回复 自动转tts。。。";
+    APP_LOG_DEBUG("收到回复 自动转tts...");
 
     if(!send_requests_to_tts_after_ollama_auto()){
         return false;
@@ -538,13 +560,13 @@ void T_Chat::parseResponse(QNetworkReply *reply)
             }
             else
             {
-                qDebug() << "Failed to parse JSON object:" << jsonObjectData;
+                APP_LOG_DEBUG("Failed to parse JSON object:" << jsonObjectData);
             }
         }
 
         if (reply->atEnd())
         {
-            qDebug() << "->>>>>>>>>receivedone";
+            APP_LOG_DEBUG("->>>>receivedone<<<<--");
             // 处理完成后的逻辑
             // ui->start_talk->setEnabled(true);
             // emit startClicked();
@@ -555,13 +577,12 @@ void T_Chat::parseResponse(QNetworkReply *reply)
 void T_Chat::playAudio(const QByteArray &audioData)
 {
     if(isPlayingAudio && audio){
-        qDebug() << "正在播放 停止播放";
+        APP_LOG_DEBUG("正在播放 停止播放");
         audio->stop();
         delete audio;
         audio = nullptr;
         isPlayingAudio = false;
     }
-    qDebug() << "in playAudio ";
     // QMediaPlayer * player = new QMediaPlayer(this);
     // QAudioOutput * audioouput = new QAudioOutput(this);
     // audioouput->setVolume(40);
@@ -600,7 +621,8 @@ void T_Chat::playAudio(const QByteArray &audioData)
     audio = new QAudioSink(format, this);
 
 
-    qDebug() << "start";
+
+    APP_LOG_DEBUG("start play");
     audio->start(audioBuffer);
     isPlayingAudio = true;
     connect(audio, &QAudioSink::stateChanged, this, [=](QAudio::State state) {

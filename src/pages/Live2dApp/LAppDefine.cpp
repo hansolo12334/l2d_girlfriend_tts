@@ -65,7 +65,7 @@ namespace LAppDefine {
     const csmInt32 PriorityForce = 3;
 
     // デバッグ用ログの表示オプション
-#ifdef QF_DEBUG
+#ifdef APP_DEBUG
     const csmBool DebugLogEnable = true;
 #else
     const csmBool DebugLogEnable = false;

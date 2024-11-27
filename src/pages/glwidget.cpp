@@ -4,12 +4,19 @@
 #include <math.h>
 //#include <QtDebug>
 //#include <QtOpenGL>
+#include<QCursor>
 #include <Windows.h>
 #include <winuser.h>
 #include "LAppDelegate.hpp"
 #include "glwidget.h"
-#include "resource_loader.hpp"
+#include "resource_loader.h"
 #include <QApplication>
+
+
+
+#include<app_log.h>
+
+
 namespace {
     constexpr int frame = 40;
     constexpr int fps = 1000/frame;
@@ -108,9 +115,33 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 void GLWidget::timerEvent(QTimerEvent*)
 {
     this->update();
+    global_pos=QCursor::pos();
+    if(outSideL2d){
+        // APP_LOG_DEBUG("鼠标全局位置: " << global_pos);
+        LAppDelegate::GetInstance()->mouseMoveEvent(global_pos.x(),global_pos.y());
+    }
 }
 
 void GLWidget::closeEvent(QCloseEvent * e)
 {
     QApplication::sendEvent(this->parent(), e);
+    APP_LOG_DEBUG("close event in!");
+}
+
+
+void GLWidget::enterEvent(QEnterEvent *event)
+{
+    QWidget::enterEvent(event);
+    APP_LOG_DEBUG("鼠标进入");
+    outSideL2d = false;
+    LAppDelegate::GetInstance()->mouseReleaseEvent(global_pos.x(),global_pos.y());
+    APP_LOG_DEBUG("标记结束点"<<this->x()<<" "<<this->y());
+}
+void GLWidget::leaveEvent(QEvent *event)
+{
+    QWidget::leaveEvent(event);
+    APP_LOG_DEBUG("鼠标离开");
+    APP_LOG_DEBUG("标记起始点"<<this->x()<<" "<<this->y());
+    outSideL2d = true;
+    LAppDelegate::GetInstance()->mousePressEvent(this->x(),this->y());
 }

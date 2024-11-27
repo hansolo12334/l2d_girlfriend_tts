@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QEvent>
+#include <QObject>
+
 
 class QfQevent:public QEvent
 {
@@ -18,8 +20,9 @@ public:
     event_type e;
 };
 
-class event_handler
+class event_handler: public QObject
 {
+Q_OBJECT
 public:
     enum class event_type
     {
@@ -33,6 +36,10 @@ public:
     void release();
     void report(event_type e,void* data);
     void resgist_main_window(QMainWindow* mw);
+
+    void set_task_done(bool done);
+    bool get_task_done();
+
 private:
     bool is_init;
     event_handler();

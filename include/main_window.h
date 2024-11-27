@@ -13,7 +13,8 @@ class T_Home;
 class T_Setting;
 class T_Chat;
 class T_live2d;
-
+class T_TTS_Setting;
+class T_Ollama_Setting;
 
 class main_window : public ElaWindow
 {
@@ -34,21 +35,23 @@ private:
     //托盘菜单
     QMenu *_trayMenu{nullptr};
     QAction *_showSettingWindow{nullptr};
-    QAction *_hideSettingWindow{nullptr};
+    QAction *_onTopL2dWindow{nullptr};
     QAction *_showL2dWindow{nullptr};
-    QAction *_hideL2dWindow{nullptr};
+    QAction *_enableFixL2dWindow{nullptr};
     QAction *_quitApp{nullptr};
 
     T_Home *_homePage{nullptr};
     T_Setting *_settingPage{nullptr};
+    T_TTS_Setting *_tts_settingPage{nullptr};
+    T_Ollama_Setting *_ollama_settingPage{nullptr};
     T_Chat *_chatPage{nullptr};
 
     T_live2d *_live2dWidget{nullptr};
 
     QString _settingKey{""};
 
-
-
+    bool _showLiveWindow = true;
+    bool _showSetting = true;
 };
 
 #endif // MAIN_WINDOW_H

@@ -14,10 +14,10 @@
 #include "LAppDelegate.hpp"
 #include "LAppModel.hpp"
 #include "LAppView.hpp"
-#include "resource_loader.hpp"
+#include "resource_loader.h"
 #include "event_handler.hpp"
 
-#include "qf_log.h"
+#include "app_log.h"
 
 using namespace Csm;
 using namespace LAppDefine;
@@ -60,7 +60,12 @@ LAppLive2DManager::LAppLive2DManager()
 
     //ChangeScene(_sceneIndex);
      auto m = resource_loader::get_instance().get_current_model();
-     if(ChangeScene((Csm::csmChar*)m->name) == false)
+
+
+     std::string name_str = m->name.toStdString();
+     const char *name_char = name_str.c_str();
+
+     if (ChangeScene((Csm::csmChar *)name_char) == false)
      {
          LAppPal::PrintLog("current module load fail");
          event_handler::get_instance().report(event_handler::event_type::app_current_modle_fail_by_initialize,NULL);
@@ -181,6 +186,7 @@ void LAppLive2DManager::OnUpdate() const
 bool LAppLive2DManager::ChangeScene(Csm::csmChar* name)
 {
     //_sceneIndex = index;
+    // DebugLogEnable=1;
     if (DebugLogEnable)
     {
         LAppPal::PrintLog("[APP]model index: %s", name);

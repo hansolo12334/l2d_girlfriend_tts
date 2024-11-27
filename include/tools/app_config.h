@@ -6,6 +6,7 @@
 #include <QSettings>
 #include<QCoreApplication>
 #include <QDir>
+#include "app_log.h"
 
 class AppConfig : public QObject {
     Q_OBJECT
@@ -38,31 +39,11 @@ public:
     void setConversationTimes(int times){_conversationTimes=times; emit configChanged();}
 
 
-    void loadSettings() {
-        qDebug() << "正在加载设置数据..";
-        QSettings settings(customIniFilePath(),  QSettings::IniFormat);
-        _isEnableMica = settings.value("enableMica", false).toBool();
-        _isEnableTTS = settings.value("enableTTS", true).toBool();
-        _isEnableLogging = settings.value("enableLogging", false).toBool();
-        _promot_sentence = settings.value("promot_sentence", "亲爱的，我是你的性感女友，我会为了你做任何事情。").toString();
-        _token_size = settings.value("token_size", 50).toInt();
-        _vice_choise = settings.value("voice_choise", 1).toInt();
-        _conversationTimes = settings.value("conversationTimes", 0).toInt();
-        // qDebug() << "_isEnableTTS " << _isEnableTTS;
-        // qDebug() << "_promot_sentence " << _promot_sentence;
-    }
+    void loadSettings();
 
-    void saveSettings() const {
-        QSettings settings(customIniFilePath(),  QSettings::IniFormat);
-        qDebug() << "正在保存设置数据..";
-        settings.setValue("enableMica", _isEnableMica);
-        settings.setValue("enableTTS", _isEnableTTS);
-        settings.setValue("enableLogging", _isEnableLogging);
-        settings.setValue("promot_sentence", _promot_sentence);
-        settings.setValue("token_size", _token_size);
-        settings.setValue("voice_choise", _vice_choise);
-        settings.setValue("conversationTimes", _conversationTimes);
-    }
+    void saveSettings();
+
+    void getModelList();
 
 signals:
     void configChanged();
@@ -70,17 +51,10 @@ signals:
 private:
     AppConfig() { loadSettings(); }
 
-    QString customIniFilePath() const {
-        QString dirPath =  QCoreApplication::applicationDirPath() + "/Config";
-        QDir dir;
-        qDebug() << "创建路径 "<<dirPath;
-        if (!dir.exists(dirPath))
-        {
-            dir.mkpath(dirPath);
-        }
-        return dirPath + "/test.ini";
-    }
+    QString customIniFilePath();
 
+    //确保只初始化一次
+    bool _is_init = false;
 
     bool _isEnableMica = false;
     bool _isEnableTTS = true;

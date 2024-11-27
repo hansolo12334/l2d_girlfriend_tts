@@ -36,6 +36,7 @@
 #include <QDebug>
 
 #include"app_config.h"
+#include "app_log.h"
 
 T_Home::T_Home(QWidget *parent) : T_BasePage(parent)
 {
@@ -302,7 +303,8 @@ T_Home::T_Home(QWidget *parent) : T_BasePage(parent)
 
     // 初始化提示
     ElaMessageBar::success(ElaMessageBarType::BottomRight, "Success", "初始化成功!", 2000);
-    qDebug() << "初始化成功";
+    // qDebug() << "初始化成功";
+    APP_LOG_DEBUG("初始化成功");
 }
 
 T_Home::~T_Home()
@@ -340,12 +342,11 @@ void T_Home::send_requests()
 
     // QString currentString = plainTextEdit2->toPlainText();
     if (received_txt==plainTextEdit2->toPlainText()){
-        qDebug() << "未变化 播放旧音频";
+        APP_LOG_DEBUG("未变化 播放旧音频");
         playAudio(response_data);
         return;
     }
 
-    qDebug() << "clicked!";
     ServeTTSRequest request;
 
     request.text = plainTextEdit2->toPlainText();
@@ -385,7 +386,8 @@ void T_Home::send_requests()
     QEventLoop loop; //使用 QEventLoop 阻塞 等待请求完成
     QNetworkReply *reply = manager->post(netWorkRequest, requestJsonDoc.toJson());
 
-    qDebug() << "posted!";
+
+    APP_LOG_DEBUG("posted!");
 
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
@@ -395,7 +397,7 @@ void T_Home::send_requests()
     if (statusCode.isValid())
     {
         int status = statusCode.toInt();
-        qDebug() << "Status Code:" << status;
+        APP_LOG_DEBUG("Status Code:" << status);
     }
     playAudio(response_data);
 
@@ -445,7 +447,7 @@ void T_Home::send_requests_after_ollama_auto()
     QEventLoop loop; //使用 QEventLoop 阻塞 等待请求完成
     QNetworkReply *reply = manager->post(netWorkRequest, requestJsonDoc.toJson());
 
-    qDebug() << "posted!";
+    APP_LOG_DEBUG("posted!");
 
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
@@ -455,7 +457,7 @@ void T_Home::send_requests_after_ollama_auto()
     if (statusCode.isValid())
     {
         int status = statusCode.toInt();
-        qDebug() << "Status Code:" << status;
+        APP_LOG_DEBUG("Status Code:" << status);
     }
     playAudio(response_data);
     received_txt = plainTextEdit2->toPlainText();
@@ -466,7 +468,6 @@ void T_Home::send_requests_to_ollama()
 {
 
     received_txt = "";
-    qDebug() << "clicked!";
     OllamaRequest request;
     request.model = "qwen2-rp";
     request.stream = true;
@@ -496,7 +497,8 @@ void T_Home::send_requests_to_ollama()
     QEventLoop loop; //使用 QEventLoop 阻塞 等待请求完成
     QNetworkReply *reply = manager->post(netWorkRequest, requestJsonDoc.toJson());
 
-    qDebug() << "posted!";
+
+    APP_LOG_DEBUG("posted!");
 
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     //
@@ -512,7 +514,8 @@ void T_Home::send_requests_to_ollama()
     if(!AppConfig::instance().isEnableTTS()){
         return;
     }
-    qDebug() << "收到回复 自动转tts。。。";
+
+    APP_LOG_DEBUG("收到回复 自动转tts...");
     send_requests_after_ollama_auto();
 }
 
@@ -563,13 +566,13 @@ void T_Home::parseResponse(QNetworkReply *reply)
             }
             else
             {
-                qDebug() << "Failed to parse JSON object:" << jsonObjectData;
+                APP_LOG_ERROR("Failed to parse JSON object:" << jsonObjectData);
             }
         }
 
         if (reply->atEnd())
         {
-            qDebug() << "***********************done";
+            APP_LOG_DEBUG("***********************done");
             // 处理完成后的逻辑
             // ui->start_talk->setEnabled(true);
             // emit startClicked();
@@ -618,6 +621,6 @@ void T_Home::playAudio(const QByteArray &audioData)
     QAudioSink *audio = new QAudioSink(format, this);
 
 
-    qDebug() << "start";
+    APP_LOG_DEBUG("start");
     audio->start(audioBuffer);
 }

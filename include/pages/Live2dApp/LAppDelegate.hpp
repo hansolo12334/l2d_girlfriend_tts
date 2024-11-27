@@ -123,6 +123,7 @@ private:
 
     LAppAllocator _cubismAllocator;              ///< Cubism SDK Allocator
     Csm::CubismFramework::Option _cubismOption;  ///< Cubism SDK Option
+    //自定义GL窗体
     GLWidget* _window;                         ///< OpenGL ウィンドウ
     LAppView* _view;                             ///< View情報
     bool _captured;                              ///< クリックしているか

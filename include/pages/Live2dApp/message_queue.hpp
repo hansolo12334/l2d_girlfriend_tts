@@ -36,6 +36,8 @@ public:
 		fail
 	};
 
+    bool one_task_done = false;
+
 	msg_queue();
 	~msg_queue();
 	msg_queue::status initialize(int _size, int _max_count);
@@ -52,10 +54,11 @@ private:
 	int first_block;
 	std::mutex* mut;
 	std::condition_variable* cond;
+
+
 };
 
 
 
 
 #endif // !MESSAGE_QUEUE_H
-

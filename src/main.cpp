@@ -4,7 +4,7 @@
 #include "main_window.h"
 
 #include "event_handler.hpp"
-#include "resource_loader.hpp"
+#include "resource_loader.h"
 
 
 int main(int argc,char **argv)
