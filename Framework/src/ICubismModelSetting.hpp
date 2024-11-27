@@ -72,6 +72,8 @@ public:
      * @param[in]    index   配列のインデックス値
      * @return       当たり判定に設定されたID
      */
+
+
     virtual CubismIdHandle GetHitAreaId(csmInt32 index) = 0;
 
     /**
@@ -82,6 +84,12 @@ public:
      */
     virtual const csmChar* GetHitAreaName(csmInt32 index) = 0;
 
+
+    //hansolo
+     //hansolo 把 id 和 motion读进来
+    virtual csmInt32 GetHitAreaOrder(csmInt32 index)= 0;
+    //hansolo 把 id 和 motion读进来
+    virtual const csmChar* GetHitAreaMotion(csmInt32 index)= 0;
     /**
      * @brief        物理演算設定ファイルの名前を取得する
      *

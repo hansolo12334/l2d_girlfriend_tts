@@ -276,6 +276,7 @@ void LAppDelegate::mouseReleaseEvent(int x, int y)
     {
         _captured = false;
         _view->OnTouchesEnded((float)x,(float)y);
+
     }
 }
 

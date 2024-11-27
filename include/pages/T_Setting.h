@@ -24,9 +24,12 @@ private:
     ElaRadioButton* _maximumButton{nullptr};
     ElaRadioButton* _autoButton{nullptr};
 
+
+
 private:
     ElaComboBox *_characterSelectCombobox{nullptr};
     void init_characterSelectCombobox();
+
 };
 
 #endif // T_SETTING_H

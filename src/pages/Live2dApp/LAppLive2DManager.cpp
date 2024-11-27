@@ -115,23 +115,32 @@ void LAppLive2DManager::OnTap(csmFloat32 x, csmFloat32 y)
         LAppPal::PrintLog("[APP]tap point: {x:%.2f y:%.2f}", x, y);
     }
 
+    LAppPal::PrintLog("[APP]hit area==>models.GetSize(): [%d]", _models.GetSize());
     for (csmUint32 i = 0; i < _models.GetSize(); i++)
     {
-        if (_models[i]->HitTest(HitAreaNameHead, x, y))
+        // 官方预设 只是几个特定部位
+        // if (_models[i]->HitTest(HitAreaNameHead, x, y))
+        // {
+        //     if (DebugLogEnable)
+        //     {
+        //         LAppPal::PrintLog("[APP]hit area: [%s]", HitAreaNameHead);
+        //     }
+        //     _models[i]->SetRandomExpression();
+        // }
+        // else if (_models[i]->HitTest(HitAreaNameBody, x, y))
+        // {
+        //     if (DebugLogEnable)
+        //     {
+        //         LAppPal::PrintLog("[APP]hit area: [%s]", HitAreaNameBody);
+        //     }
+            // _models[i]->StartRandomMotion(MotionGroupTapBody, PriorityNormal, FinishedMotion);
+        // }
+
+        Csm::csmString hitArea_motion;
+        if (_models[i]->HitTest_Custom(x, y,hitArea_motion))
         {
-            if (DebugLogEnable)
-            {
-                LAppPal::PrintLog("[APP]hit area: [%s]", HitAreaNameHead);
-            }
-            _models[i]->SetRandomExpression();
-        }
-        else if (_models[i]->HitTest(HitAreaNameBody, x, y))
-        {
-            if (DebugLogEnable)
-            {
-                LAppPal::PrintLog("[APP]hit area: [%s]", HitAreaNameBody);
-            }
-            _models[i]->StartRandomMotion(MotionGroupTapBody, PriorityNormal, FinishedMotion);
+            LAppPal::PrintLog("[APP] get hit area: [%s]", hitArea_motion.GetRawString());
+            _models[i]->StartMotion(hitArea_motion.GetRawString(), 0, PriorityForce, FinishedMotion);
         }
     }
 }

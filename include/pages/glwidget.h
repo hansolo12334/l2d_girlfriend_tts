@@ -17,7 +17,7 @@ public:
     GLWidget(QWidget *parent = 0);
     ~GLWidget();
 private:
-    QPoint global_pos{0,0};
+    QPoint mouse_global_pos{0,0};
     bool outSideL2d = true;
 
 protected:

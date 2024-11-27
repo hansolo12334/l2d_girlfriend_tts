@@ -261,12 +261,33 @@ bool LAppModel::SetupModel(ICubismModelSetting* setting)
         PreloadMotionGroup(group);
     }
 
+
+    //
+    PreloadHitAreaGroup();
+
     _motionManager->StopAllMotions();
 
     _updating = false;
     _initialized = true;
     return true;
 }
+
+void LAppModel::PreloadHitAreaGroup()
+{
+    for (csmInt32 i = 0; i < _modelSetting->GetHitAreasCount(); i++)
+    {
+        const csmChar* area_name = _modelSetting->GetHitAreaName(i);
+        LAppPal::PrintLog("[APP] getHitAreaName  :  =>  %s", area_name);
+        hitArea_single temp;
+        temp.name = area_name;
+        temp.touch_id=_modelSetting->GetHitAreaId(i);
+        temp.motion = const_cast<Csm::csmChar*>(_modelSetting->GetHitAreaMotion(i));
+        temp.order = _modelSetting->GetHitAreaOrder(i);
+        _hitAreas.PushBack(temp);
+        LAppPal::PrintLog("[APP] PreloadHitAreaGroup: %s %s %d %d ", area_name, temp.motion, temp.order,temp.touch_id->GetString());
+    }
+}
+
 
 void LAppModel::PreloadMotionGroup(const csmChar* group)
 {
@@ -557,22 +578,69 @@ void LAppModel::Draw(CubismMatrix44& matrix)
     DoDraw();
 }
 
-csmBool LAppModel::HitTest(const csmChar* hitAreaName, csmFloat32 x, csmFloat32 y)
+
+csmBool LAppModel::HitTest_Custom(Csm::csmFloat32 x, Csm::csmFloat32 y,Csm::csmString &hit_motion)
 {
-    // 透明時は当たり判定なし。
+    // 透明时没有命中检测
     if (_opacity < 1)
     {
         return false;
     }
+    // 获取可触摸区域的数量
     const csmInt32 count = _modelSetting->GetHitAreasCount();
+    LAppPal::PrintLog("[APP]hit area==>GetHitAreasCount : [%d]", count);
+
+    for(csmInt32 i = 0; i < count; i++)
+    {
+         // 比较命中区域名称
+        const CubismIdHandle drawID = _modelSetting->GetHitAreaId(i);
+
+        if(IsHit(drawID, x, y)){
+            LAppPal::PrintLog("[APP]hit area==>GetHitAreaName : [%s]",_modelSetting->GetHitAreaName(i));
+            LAppPal::PrintLog("[APP]hit area==>GetHitAreaId : [%d]",drawID);
+
+            for (csmInt32 j = 0; j < count;j++){
+                const Csm::csmChar *cur_name = _hitAreas[j].name.GetRawString();
+                if(strcmp(cur_name,_modelSetting->GetHitAreaName(i))==0){
+                    LAppPal::PrintLog("[APP]hit area find fit motion==>  : [%s]",_hitAreas[j].motion);
+                    hit_motion = Csm::csmString(_hitAreas[j].motion);
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+csmBool LAppModel::HitTest(const csmChar* hitAreaName, csmFloat32 x, csmFloat32 y)
+{
+    // 透明時は当たり判定なし。
+    // 透明时没有命中检测
+    if (_opacity < 1)
+    {
+        return false;
+    }
+    // 获取可触摸区域的数量
+    const csmInt32 count = _modelSetting->GetHitAreasCount();
+    LAppPal::PrintLog("[APP]hit area==>GetHitAreasCount : [%d]", count);
     for (csmInt32 i = 0; i < count; i++)
     {
+         // 比较命中区域名称
+        const CubismIdHandle drawID = _modelSetting->GetHitAreaId(i);
+
+        if(IsHit(drawID, x, y)){
+            LAppPal::PrintLog("[APP]hit area==>GetHitAreaName : [%s]",_modelSetting->GetHitAreaName(i));
+            LAppPal::PrintLog("[APP]hit area==>GetHitAreaId : [%d]",drawID);
+            return true;
+        }
         if (strcmp(_modelSetting->GetHitAreaName(i), hitAreaName) == 0)
         {
-            const CubismIdHandle drawID = _modelSetting->GetHitAreaId(i);
+            // 获取命中区域的绘制 ID
+            // LAppPal::PrintLog("[APP]hit area==>GetHitAreaId : [%d]", drawID);
             return IsHit(drawID, x, y);
         }
     }
+    // 如果没有找到匹配的命中区域，返回 false
     return false; // 存在しない場合はfalse
 }
 

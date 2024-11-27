@@ -37,15 +37,17 @@ T_Setting::T_Setting(QWidget *parent) : T_BasePage(parent)
     themeText->setTextPixelSize(18);
 
 
-
+    _characterSelectCombobox = new ElaComboBox(this);
+    ElaScrollPageArea *characterSwitchArea = new ElaScrollPageArea(this);
+    QHBoxLayout *characterSwitchLayout = new QHBoxLayout(characterSwitchArea);
+    ElaText *characterSwitchText = new ElaText("角色选择", this);
+    characterSwitchText->setWordWrap(false);
+    characterSwitchText->setTextPixelSize(15);
+    characterSwitchLayout->addWidget(characterSwitchText);
+    characterSwitchLayout->addStretch();
+    characterSwitchLayout->addWidget(_characterSelectCombobox);
 
     init_characterSelectCombobox();
-
-
-
-
-
-
 
 
     _themeComboBox = new ElaComboBox(this);
@@ -290,6 +292,8 @@ T_Setting::T_Setting(QWidget *parent) : T_BasePage(parent)
     centralWidget->setWindowTitle("Base Setting");
     QVBoxLayout *centerLayout = new QVBoxLayout(centralWidget);
     centerLayout->addSpacing(30);
+
+    centerLayout->addWidget(characterSwitchArea);
     centerLayout->addWidget(themeText);
     centerLayout->addSpacing(10);
     centerLayout->addWidget(themeSwitchArea);
@@ -322,4 +326,5 @@ T_Setting::~T_Setting()
 void T_Setting::init_characterSelectCombobox()
 {
     auto modles = resource_loader::get_instance().get_model_list();
+    APP_LOG_DEBUG(modles.length());
 }

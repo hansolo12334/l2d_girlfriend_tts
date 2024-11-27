@@ -2,54 +2,28 @@
   "Version": 3,
   "Type": 0,
   "FileReferences": {
-    "Moc": "Hiyori.moc3",
+    "Moc": "baerdimo_5.moc3",
     "Textures": [
-      "Hiyori.2048/texture_00.png",
-      "Hiyori.2048/texture_01.png"
+      "textures/texture_00.png"
     ],
-    "Physics": "Hiyori.physics3.json",
+    "Physics": "baerdimo_5.physics3.json",
     "PhysicsV2": {
-      "File": "Hiyori.physics3.json"
+      "File": "baerdimo_5.physics3.json"
     },
-    "Pose": "Hiyori.pose3.json",
     "Motions": {
-      "Idle": [
+      "touch_special": [
         {
-          "File": "motions/Hiyori_m01.motion3.json"
-        },
-        {
-          "File": "motions/Hiyori_m02.motion3.json"
-        },
-        {
-          "File": "motions/Hiyori_m03.motion3.json"
-        },
-        {
-          "File": "motions/Hiyori_m05.motion3.json"
-        },
-        {
-          "File": "motions/Hiyori_m06.motion3.json"
-        },
-        {
-          "File": "motions/Hiyori_m07.motion3.json"
-        },
-        {
-          "File": "motions/Hiyori_m08.motion3.json"
-        },
-        {
-          "File": "motions/Hiyori_m09.motion3.json"
-        },
-        {
-          "File": "motions/Hiyori_m10.motion3.json"
+          "File": "motions/touch_special.motion3.json"
         }
       ],
-      "TapBody": [
+      "touch_head": [
         {
-          "File": "motions/Hiyori_m04.motion3.json"
+          "File": "motions/touch_head.motion3.json"
         }
       ],
-      "TapHead": [
+      "touch_body": [
         {
-          "File": "motions/Hiyori_m08.motion3.json"
+          "File": "motions/touch_body.motion3.json"
         }
       ]
     }
@@ -124,14 +98,19 @@
   },
   "HitAreas": [
     {
-      "Name": "Body",
-      "Id": "HitArea",
-      "Motion": "TapBody"
+      "Name": "special",
+      "Id": "TouchSpecial",
+      "Motion": "touch_special"
     },
     {
-      "Name": "Head",
-      "Id": "ArtMesh56",
-      "Motion": "TapHead"
+      "Name": "head",
+      "Id": "TouchHead",
+      "Motion": "touch_head"
+    },
+    {
+      "Name": "body",
+      "Id": "TouchBody",
+      "Motion": "touch_body"
     }
   ],
   "Options": {

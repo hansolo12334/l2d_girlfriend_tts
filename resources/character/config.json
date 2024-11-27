@@ -10,10 +10,20 @@
             "name": "Hiyori",
             "window_x": 1659,
             "window_y": 668
+        },
+        {
+            "name": "baerdimo_5",
+            "window_x": 1659,
+            "window_y": 668
+        },
+        {
+            "name": "xuefeng",
+            "window_x": 1659,
+            "window_y": 668
         }
     ],
     "userdata": {
-        "current_model": "Hiyori",
+        "current_model": "baerdimo_5",
         "top": true,
         "move": true
     }

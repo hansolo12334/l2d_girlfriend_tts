@@ -7,7 +7,12 @@
 #include<QCursor>
 #include <Windows.h>
 #include <winuser.h>
+
 #include "LAppDelegate.hpp"
+#include "LAppLive2DManager.hpp"
+#include "LAppModel.hpp"
+#include    "LAppView.hpp"
+
 #include "glwidget.h"
 #include "resource_loader.h"
 #include <QApplication>
@@ -26,6 +31,7 @@ GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
 {
     this->startTimer(fps);
+    mouse_global_pos=QCursor::pos();
 }
 
 GLWidget::~GLWidget()
@@ -76,7 +82,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         int x = pos.x();
         int y = pos.y();
         //qDebug("x:%d y:%d",x,y);
-        LAppDelegate::GetInstance()->mousePressEvent(x,y);
+        // APP_LOG_DEBUG("width1: " << this->window()->width() << " " << this->window()->height());
+        LAppDelegate::GetInstance()->mousePressEvent(x, y);
     }
 }
 
@@ -92,7 +99,9 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
         int x = pos.x();
         int y = pos.y();
         //qDebug("x:%d y:%d",x,y);
+        // APP_LOG_DEBUG("release" << x << " " << y);
         LAppDelegate::GetInstance()->mouseReleaseEvent(x,y);
+
     }
 }
 
@@ -108,6 +117,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         int x = pos.x();
         int y = pos.y();
         //qDebug("x:%d y:%d",x,y);
+        // APP_LOG_DEBUG("move" << x << " " << y);
         LAppDelegate::GetInstance()->mouseMoveEvent(x,y);
     }
 }
@@ -115,33 +125,41 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 void GLWidget::timerEvent(QTimerEvent*)
 {
     this->update();
-    global_pos=QCursor::pos();
+    mouse_global_pos=QCursor::pos();
     if(outSideL2d){
         // APP_LOG_DEBUG("鼠标全局位置: " << global_pos);
-        LAppDelegate::GetInstance()->mouseMoveEvent(global_pos.x(),global_pos.y());
+
+        QPoint globalPos = this->mapToGlobal(QPoint(0, 0));
+        QPoint relative_mouse_pos = mouse_global_pos - globalPos;
+
+        // LAppModel *model = LAppLive2DManager::GetInstance()->GetModel(0);
+        // model->SetDragging(relative_mouse_pos.x(),relative_mouse_pos.y());
+        // LAppDelegate::GetInstance()->mouseMoveEvent();
+        LAppDelegate::GetInstance()->GetView()->OnTouchesMoved(relative_mouse_pos.x(),relative_mouse_pos.y());
     }
 }
 
 void GLWidget::closeEvent(QCloseEvent * e)
 {
     QApplication::sendEvent(this->parent(), e);
-    APP_LOG_DEBUG("close event in!");
+    // APP_LOG_DEBUG("close event in!");
 }
 
 
 void GLWidget::enterEvent(QEnterEvent *event)
 {
     QWidget::enterEvent(event);
-    APP_LOG_DEBUG("鼠标进入");
+    // APP_LOG_DEBUG("鼠标进入");
     outSideL2d = false;
-    LAppDelegate::GetInstance()->mouseReleaseEvent(global_pos.x(),global_pos.y());
-    APP_LOG_DEBUG("标记结束点"<<this->x()<<" "<<this->y());
+    // LAppDelegate::GetInstance()->mouseReleaseEvent(this->window()->width()/2,this->window()->height()/3);
+    // APP_LOG_DEBUG("标记结束点"<<this->x()<<" "<<this->y());
+
+
 }
 void GLWidget::leaveEvent(QEvent *event)
 {
     QWidget::leaveEvent(event);
-    APP_LOG_DEBUG("鼠标离开");
-    APP_LOG_DEBUG("标记起始点"<<this->x()<<" "<<this->y());
+    // APP_LOG_DEBUG("鼠标离开");
     outSideL2d = true;
-    LAppDelegate::GetInstance()->mousePressEvent(this->x(),this->y());
+    // LAppDelegate::GetInstance()->mousePressEvent(this->window()->width()/2,this->window()->height()/3);
 }

@@ -63,6 +63,11 @@ public:
 
     const csmChar* GetHitAreaName(csmInt32 index);
 
+    //hansolo 把 id 和 motion读进来
+    csmInt32 GetHitAreaOrder(csmInt32 index);
+    //hansolo 把 id 和 motion读进来
+    const csmChar* GetHitAreaMotion(csmInt32 index);
+
     const csmChar* GetPhysicsFileName();
 
     const csmChar* GetPoseFileName();

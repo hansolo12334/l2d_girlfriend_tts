@@ -108,7 +108,8 @@ public:
      * @param[in]   y               判定を行うY座標
      */
     virtual Csm::csmBool HitTest(const Csm::csmChar* hitAreaName, Csm::csmFloat32 x, Csm::csmFloat32 y);
-
+    //自定义 触摸区域检测
+    virtual Csm::csmBool HitTest_Custom(Csm::csmFloat32 x, Csm::csmFloat32 y,Csm::csmString &hit_motion);
     /**
      * @brief   別ターゲットに描画する際に使用するバッファの取得
      */
@@ -145,6 +146,8 @@ private:
      */
     void PreloadMotionGroup(const Csm::csmChar* group);
 
+    //hansolo 预加载 触摸区域
+    void PreloadHitAreaGroup();
     /**
      * @brief   モーションデータをグループ名から一括で解放する。<br>
      *           モーションデータの名前は内部でModelSettingから取得する。
@@ -175,7 +178,17 @@ private:
     Csm::csmMap<Csm::csmString, Csm::ACubismMotion*>   _motions; ///< 読み込まれているモーションのリスト
     Csm::csmMap<Csm::csmString, Csm::ACubismMotion*>   _expressions; ///< 読み込まれている表情のリスト
     Csm::csmVector<Csm::csmRectF> _hitArea;
+    //hansolo 触摸区域名称
+    struct hitArea_single
+    {
+        Csm::csmString name;
+        Csm::CubismIdHandle touch_id;
+        Csm::csmInt32  order;
+        Csm::csmChar* motion;
+    };
+    Csm::csmVector<hitArea_single> _hitAreas;
     Csm::csmVector<Csm::csmRectF> _userArea;
+
     const Csm::CubismId* _idParamAngleX; ///< パラメータID: ParamAngleX
     const Csm::CubismId* _idParamAngleY; ///< パラメータID: ParamAngleX
     const Csm::CubismId* _idParamAngleZ; ///< パラメータID: ParamAngleX
@@ -187,6 +200,3 @@ private:
 
     Csm::Rendering::CubismOffscreenFrame_OpenGLES2  _renderBuffer;   ///< フレームバッファ以外の描画先
 };
-
-
-

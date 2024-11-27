@@ -81,6 +81,7 @@ public:
     /**
     * @brief   Window情報を取得する。
     */
+   //han 自定义opengl窗口
     GLWidget* GetWindow() { return _window; }
 
     /**

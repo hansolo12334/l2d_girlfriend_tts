@@ -38,12 +38,17 @@ const csmChar* Pose = "Pose";
 const csmChar* Expressions = "Expressions";
 const csmChar* Motions = "Motions";
 
+
+
 const csmChar* UserData = "UserData";
 const csmChar* Name = "Name";
 const csmChar* FilePath = "File";
 const csmChar* Id = "Id";
 const csmChar* Ids = "Ids";
 const csmChar* Target = "Target";
+
+const csmChar *Motion = "Motion";
+const csmChar *Order = "Order";
 
 // Motions
 const csmChar* Idle = "Idle";
@@ -239,6 +244,16 @@ CubismIdHandle CubismModelSettingJson::GetHitAreaId(csmInt32 index)
 const csmChar* CubismModelSettingJson::GetHitAreaName(csmInt32 index)
 {
     return (*_jsonValue[FrequentNode_HitAreas])[index][Name].GetRawString();
+}
+
+csmInt32 CubismModelSettingJson::GetHitAreaOrder(csmInt32 index)
+{
+    return (*_jsonValue[FrequentNode_HitAreas])[index][Order].ToInt();
+}
+const csmChar* CubismModelSettingJson::GetHitAreaMotion(csmInt32 index)
+{
+    return (*_jsonValue[FrequentNode_HitAreas])[index][Motion].GetRawString();
+    // return (*_jsonValue[FrequentNode_Motions])[groupName][index][FilePath].GetRawString();
 }
 
 // 物理演算、パーツ切り替え、表情ファイルについて
