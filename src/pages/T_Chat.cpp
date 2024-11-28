@@ -369,7 +369,7 @@ bool T_Chat::send_requests_to_tts_after_ollama_auto()
     request.streaming = true;
     request.use_memory_cache = "never";
     request.seed = std::nullopt;
-    ;
+
 
     QJsonObject requestJson = request.toJson();
     QJsonDocument requestJsonDoc(requestJson);

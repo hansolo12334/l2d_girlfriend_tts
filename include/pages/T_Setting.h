@@ -28,8 +28,17 @@ private:
 
 private:
     ElaComboBox *_characterSelectCombobox{nullptr};
+    QList<QAction*> model_action_list;
+    QActionGroup *g_change;
+
     void init_characterSelectCombobox();
 
+private:
+    Q_SLOT void on_character_switch(int index);
+
+Q_SIGNALS:
+    Q_SIGNAL void error_exit_app();
+    Q_SIGNAL void switch_character_xy(int x,int y);
 };
 
 #endif // T_SETTING_H

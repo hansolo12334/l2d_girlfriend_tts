@@ -2,14 +2,16 @@
 #define T_LIVE2D_H
 
 #include "glwidget.h"
+#include "hover_button.h"
+#include "dialog_input_edit.h"
 
+#include <QCloseEvent>
+#include <QGuiApplication>
 #include <QHBoxLayOut>
-#include <QVBoxLayOut>
-#include<QCloseEvent>
-#include<QMouseEvent>
+#include <QMouseEvent>
 #include <QPoint>
-#include<QGuiApplication>
-
+#include <QPushButton>
+#include <QVBoxLayOut>
 class T_live2d : public QWidget
 {
     Q_OBJECT
@@ -21,6 +23,8 @@ public:
     GLWidget *gl_live2dWidget;
 
     QVBoxLayout *v_layout{nullptr};
+    HoverButton *open_dialogBt{nullptr};
+    dialogInputEdit *dialog_inpit{nullptr};
 
 private:
     int pos_x{};
@@ -29,12 +33,16 @@ private:
     QPoint curPos;
     qreal dpiScale;
 
+
 protected:
-    void closeEvent(QCloseEvent * e) override;
+    void closeEvent(QCloseEvent *e) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
-    void customEvent(QEvent* e) override;
+    void customEvent(QEvent *e) override;
+
+private:
+    Q_SLOT void on_open_dialogBt_clicked();
 };
 
 

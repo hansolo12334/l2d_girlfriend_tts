@@ -254,11 +254,12 @@ bool resource_loader::update_current_model(uint32_t index)
             event_handler::get_instance().report(event_handler::event_type::app_config_change,
                                                  reinterpret_cast<void *>(new_config));
 
-            // event_handler::get_instance().set_task_done(false);
+            event_handler::get_instance().set_task_done(false);
 
-            // while(!event_handler::get_instance().get_task_done()){
+            while(!event_handler::get_instance().get_task_done()){
 
-            // }
+            }
+            APP_LOG_DEBUG("update_current_model done");
             return true;
         }
     }

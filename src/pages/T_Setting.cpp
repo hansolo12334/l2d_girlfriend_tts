@@ -20,6 +20,8 @@
 
 #include "app_config.h"
 #include "resource_loader.h"
+#include "LAppLive2DManager.hpp"
+#include "event_handler.hpp"
 
 T_Setting::T_Setting(QWidget *parent) : T_BasePage(parent)
 {
@@ -325,6 +327,66 @@ T_Setting::~T_Setting()
 
 void T_Setting::init_characterSelectCombobox()
 {
-    auto modles = resource_loader::get_instance().get_model_list();
-    APP_LOG_DEBUG(modles.length());
+    QVector<resource_loader::model> modles = resource_loader::get_instance().get_model_list();
+    auto current_model = resource_loader::get_instance().get_current_model();
+
+
+    int currentIdx = 0;
+    for (auto i = 0; i < modles.size();i++){
+
+        _characterSelectCombobox->addItem(modles[i].name);
+        if(modles[i].name==current_model->name){
+            currentIdx = i;
+            // APP_LOG_DEBUG("set current model name "<<modles[i].name);
+        }
+    }
+    // APP_LOG_DEBUG("set current model currentIdx "<<currentIdx);
+    _characterSelectCombobox->setCurrentIndex(currentIdx);
+
+    connect(_characterSelectCombobox, &ElaComboBox::currentIndexChanged, this, &T_Setting::on_character_switch);
+}
+
+
+void T_Setting::on_character_switch(int index)
+{
+    QVector<resource_loader::model> modles = resource_loader::get_instance().get_model_list();
+    APP_LOG_DEBUG("switch model ==> " << modles[index].name);
+    if(resource_loader::get_instance().update_current_model(index))
+    {
+        bool load_fail = true;
+        auto current_model = resource_loader::get_instance().get_current_model();
+        if(LAppLive2DManager::GetInstance()->ChangeScene((Csm::csmChar*)current_model->name.toStdString().c_str()))
+        {
+        // emit switch_character_xy(current_model->x, current_model->y);
+        load_fail = false;
+        }
+        else
+         {
+            int _counter = 0;
+            for(auto& item:resource_loader::get_instance().get_model_list())
+            {
+                if(_counter != index)
+                {
+                    if(LAppLive2DManager::GetInstance()->ChangeScene((Csm::csmChar*)item.name.toStdString().c_str()))
+                    {
+                        load_fail = false;
+                        APP_LOG_ERROR("waring: load model fail,try load default model");
+                        this->_characterSelectCombobox->setCurrentIndex(_counter);
+                        resource_loader::get_instance().update_current_model(_counter);
+                        break;
+                    }
+                }
+                _counter++;
+            }
+         }
+
+        if(load_fail)
+        {
+            APP_LOG_INFO("app exit");
+            resource_loader::get_instance().release();
+            event_handler::get_instance().release();
+            // this->app->exit(0);
+            emit error_exit_app();
+        }
+    }
 }

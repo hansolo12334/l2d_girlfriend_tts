@@ -8,6 +8,7 @@
 #include "event_handler.hpp"
 
 
+
 T_live2d::T_live2d(QWidget *parent)
     : QWidget(parent)
 {
@@ -20,7 +21,7 @@ T_live2d::T_live2d(QWidget *parent)
     bb.fEnable = TRUE;
     DwmEnableBlurBehindWindow((HWND)viewId, &bb);
 
-    this->setAttribute(Qt::WA_TranslucentBackground);
+    // this->setAttribute(Qt::WA_TranslucentBackground);
     this->setWindowFlag(Qt::FramelessWindowHint);
 
     this->setWindowFlag(Qt::WindowType::MSWindowsOwnDC,false);
@@ -34,11 +35,19 @@ T_live2d::T_live2d(QWidget *parent)
 
     v_layout = new QVBoxLayout();
     gl_live2dWidget=new GLWidget();
+    open_dialogBt = new HoverButton();
+    open_dialogBt->setFixedHeight(30);
+    open_dialogBt->setOnHoverText("开启对话框");
+    connect(open_dialogBt, &QPushButton::clicked, this, &T_live2d::on_open_dialogBt_clicked);
 
+    v_layout->setSpacing(0);
     v_layout->addWidget(gl_live2dWidget);
+    v_layout->addWidget(open_dialogBt);
+
+    v_layout->setContentsMargins(0, 0, 0, 0);
 
     this->setLayout(v_layout);
-    this->resize(300, 400);
+    this->resize(300, 430);
 
 
     int cxScreen,cyScreen;
@@ -58,6 +67,10 @@ T_live2d::T_live2d(QWidget *parent)
         APP_LOG_DEBUG("重新定位");
         this->move(cxScreen/dpiScale - this->width(), cyScreen/dpiScale - this->height());
     }
+
+
+    dialog_inpit = new dialogInputEdit();
+    dialog_inpit->moveToButtom();
 
 }
 
@@ -145,4 +158,12 @@ void T_live2d::mouseMoveEvent(QMouseEvent *event)
 void T_live2d::customEvent(QEvent* e)
 {
 
+}
+
+
+
+void T_live2d::on_open_dialogBt_clicked()
+{
+    APP_LOG_DEBUG("on_open_dialogBt_clicked");
+    dialog_inpit->show();
 }

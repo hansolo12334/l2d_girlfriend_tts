@@ -22,6 +22,8 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network Multimedi
 FILE(GLOB SOURCE_FILE src/*.cpp)
 FILE(GLOB HEADER_FILE include/*.h)
 FILE(GLOB PAGES_FILE include/pages/*.h src/pages/*.cpp)
+FILE(GLOB SMALL_WIDGETS_FILE include/small_widgets/*.h src/small_widgets/*.cpp)
+FILE(GLOB API_FILE include/api/*.h src/api/*.cpp)
 
 FILE(GLOB LIVE2DAPP_FILE include/pages/Live2dApp/*hpp src/pages/Live2dApp/*cpp)
 # FILE(GLOB GL_WIDGET_FILE src/pages/gl_widget/*cpp)
@@ -32,7 +34,8 @@ FILE(GLOB TOOLS include/tools/*.h src/tools/*.cpp src/tools/*.c)
 
 # source_group(PAGES_SOURCE FILES ${PAGES_FILE})
 SET(PAGES_SOURCE include/pages/)
-
+SET(API_SOURCE include/api/)
+SET(SMALLL_WIDGETS_SOURCE include/small_widgets)
 SET(LIVE2DAPP_SOURCE include/pages/Live2dApp/)
 # SET(GL_WIDGET_SOURCE include/pages/gl_widget/)
 SET(TOOLS_SOURCE include/tools/)
@@ -47,6 +50,8 @@ set(PROJECT_SOURCES
     ${SOURCE_FILE}
     ${HEADER_FILE}
     ${PAGES_FILE}
+    ${API_FILE}
+    ${SMALL_WIDGETS_FILE}
     ${TOOLS}
     ${LIVE2DAPP_FILE}
     # ${GL_WIDGET_FILE}
@@ -139,6 +144,8 @@ target_include_directories(ElaWidget_QT PUBLIC
     # ExamplePage
     # ModelView
     ${PAGES_SOURCE}
+    ${API_SOURCE}
+    ${SMALLL_WIDGETS_SOURCE}
     ${TOOLS_SOURCE}
     ${LIVE2DAPP_SOURCE}
     # ${GL_WIDGET_SOURCE}

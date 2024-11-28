@@ -91,6 +91,19 @@ void main_window::init_content()
     this->addPageNode("TTS Setting", _tts_settingPage, ElaIconType::GearComplex);
     this->addPageNode("Ollama Setting", _ollama_settingPage, ElaIconType::GearComplex);
 
+
+    connect(_settingPage, &T_Setting::error_exit_app, [=]() {
+        _live2dWidget->hide();
+        _live2dWidget->resize(640,480);
+        int cxScreen,cyScreen;
+        cxScreen=GetSystemMetrics(SM_CXSCREEN);
+        cyScreen=GetSystemMetrics(SM_CYSCREEN);
+        _live2dWidget->move(cxScreen/2-320,cyScreen/2 - 240);
+        _live2dWidget->show();
+        APP_LOG_ERROR("资源文件错误,程序终止");
+        qApp->exit();
+    });
+
     // this->addFooterNode("Setting", _settingPage, _settingKey, 0, ElaIconType::GearComplex);
 
     // connect(&AppConfig::instance(), &AppConfig::configChanged, this, [=]() {
