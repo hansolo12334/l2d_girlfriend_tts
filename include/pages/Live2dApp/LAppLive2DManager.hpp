@@ -95,6 +95,10 @@ public:
      */
     void SetViewMatrix(Live2D::Cubism::Framework::CubismMatrix44* m);
 
+
+    //hansolo 设置嘴部张合
+    void user_lipSync(Csm::csmFloat32 value);
+
 private:
     /**
     * @brief  コンストラクタ

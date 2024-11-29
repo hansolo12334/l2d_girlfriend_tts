@@ -27,6 +27,11 @@ public:
     }
 
     void playAudio(const QByteArray &audioData);
+    void playAudio_pull(const QByteArray audioData);
+
+    double get_audio_rms(){
+        return rms;
+    }
 
 private:
     bool _isPlayingAudio = false;
@@ -43,9 +48,6 @@ private:
     QScopedPointer<QAudioSource> audioInputsource;
     QScopedPointer<QAudioSink> audioOutputsource;
 
-    QTimer *m_inputTimer;
-    QTimer *m_outputTimer;
-
     QAudioFormat inputAudioFormat;
     QAudioFormat outputAudioFormat;
 
@@ -57,6 +59,7 @@ private:
     QByteArray recordedAudioData;
 
     bool isInit = false;
+    double rms = 0;
 
 
 private:
@@ -71,6 +74,8 @@ private:
 
 
     void calculateRms(const QByteArray &audioData);
+    template <typename T>
+    T clamp(const T &value, const T &low, const T &high);
 
 private:
     Q_SLOT void handleStateChanged(QAudio::State newState);

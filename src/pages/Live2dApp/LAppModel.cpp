@@ -61,6 +61,7 @@ LAppModel::LAppModel()
     _idParamBodyAngleX = CubismFramework::GetIdManager()->GetId(ParamBodyAngleX);
     _idParamEyeBallX = CubismFramework::GetIdManager()->GetId(ParamEyeBallX);
     _idParamEyeBallY = CubismFramework::GetIdManager()->GetId(ParamEyeBallY);
+
 }
 
 LAppModel::~LAppModel()
@@ -242,6 +243,7 @@ bool LAppModel::SetupModel(ICubismModelSetting* setting)
     // LipSyncIds
     {
         csmInt32 lipSyncIdCount = _modelSetting->GetLipSyncParameterCount();
+        LAppPal::PrintLog("[APP]  lipSyncIdCount: %d",lipSyncIdCount);
         for (csmInt32 i = 0; i < lipSyncIdCount; ++i)
         {
             _lipSyncIds.PushBack(_modelSetting->GetLipSyncParameterId(i));
@@ -450,7 +452,7 @@ void LAppModel::Update()
     {
         // リアルタイムでリップシンクを行う場合、システムから音量を取得して0〜1の範囲で値を入力します。
         csmFloat32 value = 0.0f;
-
+        // LAppPal::PrintLog("[APP]  lipSync: %d",_lipSyncIds.GetSize());
         // 状態更新/RMS値取得
         _wavFileHandler.Update(deltaTimeSeconds);
         value = _wavFileHandler.GetRms();
@@ -467,8 +469,17 @@ void LAppModel::Update()
         _pose->UpdateParameters(_model, deltaTimeSeconds);
     }
 
+    //嘴巴
+    _model->AddParameterValue(CubismFramework::GetIdManager()->GetId(csmString("ParamMouthOpenY").GetRawString()), mouse_user_value, 0.8f);
+
+
     _model->Update();
 
+}
+
+void LAppModel::set_lipSynclValue(csmFloat32 value)
+{
+    mouse_user_value = value;
 }
 
 CubismMotionQueueEntryHandle LAppModel::StartMotion(const csmChar* group, csmInt32 no, csmInt32 priority, ACubismMotion::FinishedMotionCallback onFinishedMotionHandler)

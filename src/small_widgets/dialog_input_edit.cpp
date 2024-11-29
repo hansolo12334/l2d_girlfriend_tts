@@ -15,6 +15,12 @@
 
 #include "media_manager.h"
 
+#include "ElaSlider.h"
+
+#include"LAppLive2DManager.hpp"
+#include"LAppModel.hpp"
+#include <CubismDefaultParameterId.hpp>
+
 dialogInputEdit::dialogInputEdit(QWidget *parent)
  :QWidget(parent)
 {
@@ -54,12 +60,23 @@ dialogInputEdit::dialogInputEdit(QWidget *parent)
     _voiceInputBt->setLightHoverColor(ElaThemeColor(ElaThemeType::Light, PrimaryHover));
     _voiceInputBt->autoFillBackground();
 
+
+    ElaSlider *tokenSize_slider = new ElaSlider(this);
+    tokenSize_slider->setRange(0, 10);
+    connect(tokenSize_slider, &ElaSlider::valueChanged, this, [=]() {
+        //共用的全局设置数据
+        // qDebug() << tokenSize_slider->value();
+        Live2D::Cubism::Framework::csmFloat32 vv = static_cast<Live2D::Cubism::Framework::csmFloat32>(tokenSize_slider->value() * 0.1f);
+        LAppLive2DManager::GetInstance()->user_lipSync(vv);
+    });
+
     _mainLayout = new QHBoxLayout();
     _mainLayout->setContentsMargins(0, 0, 0, 0);
     _mainLayout->addWidget(_voiceInputBt);
     _mainLayout->addWidget(_inputLineEdt);
     _mainLayout->addWidget(_sendChatBt);
     _mainLayout->addWidget(_closeCurrentBt);
+    _mainLayout->addWidget(tokenSize_slider);
 
 
     this->setLayout(_mainLayout);
@@ -123,38 +140,39 @@ void dialogInputEdit::mouseReleaseEvent(QMouseEvent *event)
 
 void dialogInputEdit::inputTextEvent()
 {
-    if (_inputLineEdt->text().isEmpty()){
-        return;
-    }
+    // if (_inputLineEdt->text().isEmpty()){
+    //     return;
+    // }
 
-    Ollama::OllamaRequest ollama_request;
-    ollama_request.model = "qwen2-rp";
-    ollama_request.stream = true;
+    // Ollama::OllamaRequest ollama_request;
+    // ollama_request.model = "qwen2-rp";
+    // ollama_request.stream = true;
 
-    ollama_request.options.num_predict = AppConfig::instance().getTokenSize();
+    // ollama_request.options.num_predict = AppConfig::instance().getTokenSize();
 
-    Ollama::Ollama_messages message_a{"assistant", AppConfig::instance().getPromotSentence()};
-    // message_a.role = "assistant";
-    // message_a.content = "亲爱的，我是你的性感女友，我会为了你做任何事情。";
-    Ollama::Ollama_messages message_u{"user", _inputLineEdt->text()};
-    // message_u.role = "user";
-    // message_u.content = plainTextEdit1->toPlainText();
+    // Ollama::Ollama_messages message_a{"assistant", AppConfig::instance().getPromotSentence()};
+    // // message_a.role = "assistant";
+    // // message_a.content = "亲爱的，我是你的性感女友，我会为了你做任何事情。";
+    // Ollama::Ollama_messages message_u{"user", _inputLineEdt->text()};
+    // // message_u.role = "user";
+    // // message_u.content = plainTextEdit1->toPlainText();
 
-    ollama_request.messages.append(message_a);
-    ollama_request.messages.append(message_u);
+    // ollama_request.messages.append(message_a);
+    // ollama_request.messages.append(message_u);
 
 
-    QString re_message = "";
-    bool re = Ollama::OllamaAPI::instance().send_message_to_server(ollama_request, re_message);
+    // QString re_message = "";
+    // bool re = Ollama::OllamaAPI::instance().send_message_to_server(ollama_request, re_message);
 
-    if(re){
-        APP_LOG_DEBUG(re_message);
-    }
+    // if(re){
+    //     APP_LOG_DEBUG(re_message);
+    // }
 
     // tts
     TTS::ServeTTSRequest tts_request;
 
-    tts_request.text = re_message.remove("\\r").remove("\\n");
+    // tts_request.text = re_message.remove("\\r").remove("\\n");
+    tts_request.text = _inputLineEdt->text().remove("\\r").remove("\\n");
     // "合成所需的音频并流式返回";
     APP_LOG_DEBUG("request.text " << tts_request.text);
     // request.references.append(ServeReferenceAudio("audio1", "text1"));
@@ -177,7 +195,8 @@ void dialogInputEdit::inputTextEvent()
     bool tts_re=TTS::TTSAPI::instance().send_message_to_server(tts_request, response_data);
 
     if(tts_re){
-        AudioHandler::instance().playAudio(response_data);
+        // AudioHandler::instance().playAudio(response_data);
+        AudioHandler::instance().playAudio_pull(response_data);
     }
 
 }

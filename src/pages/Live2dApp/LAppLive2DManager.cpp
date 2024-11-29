@@ -144,6 +144,14 @@ void LAppLive2DManager::OnTap(csmFloat32 x, csmFloat32 y)
         }
     }
 }
+//hansolo
+void LAppLive2DManager::user_lipSync(csmFloat32 value)
+{
+    for (csmUint32 i = 0; i < _models.GetSize(); i++)
+    {
+        _models[i]->set_lipSynclValue(value);
+    }
+}
 
 void LAppLive2DManager::OnUpdate() const
 {

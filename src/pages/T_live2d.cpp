@@ -22,7 +22,7 @@ T_live2d::T_live2d(QWidget *parent)
     DwmEnableBlurBehindWindow((HWND)viewId, &bb);
 
     // this->setAttribute(Qt::WA_TranslucentBackground);
-    this->setWindowFlag(Qt::FramelessWindowHint);
+    // this->setWindowFlag(Qt::FramelessWindowHint);
 
     this->setWindowFlag(Qt::WindowType::MSWindowsOwnDC,false);
     this->setWindowFlag(Qt::Tool);

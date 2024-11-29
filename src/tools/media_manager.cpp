@@ -28,14 +28,18 @@ AudioHandler::AudioHandler()
             qDebug() << "音频输出：" << aa.description();
         }
 
+        initializeInputAudio(QMediaDevices::defaultAudioInput());
+        m_outputMediaDevices = new QMediaDevices(this);
+        initializeOutPutAudio(m_outputMediaDevices->defaultAudioOutput());
+
         output_timer = new QTimer(this);
         input_timer = new QTimer(this);
 
         connect(input_timer, &QTimer::timeout, this, &AudioHandler::onInputNotify);
-        connect(inputDevice.data(), &AudioInputDevices::levelChanged, [=](qreal value){
-        //        qDebug() << "emit signalAudioLevel(value);" << value;
-            emit signalAudioLevel(value);
-        });
+        // connect(inputDevice.data(), &AudioInputDevices::levelChanged, [=](qreal value){
+        // //        qDebug() << "emit signalAudioLevel(value);" << value;
+        //     emit signalAudioLevel(value);
+        // });
         connect(output_timer, &QTimer::timeout, this, &AudioHandler::onOutputNotify);
 
         onStopTalking();
@@ -77,9 +81,9 @@ void AudioHandler::initializeOutPutAudio(const QAudioDevice &deviceInfo)
 {
     qDebug() << "outputAudioDevice音频输出：" << deviceInfo.description();
 
-    outputAudioFormat = deviceInfo.preferredFormat();
+    // outputAudioFormat = deviceInfo.preferredFormat();
 
-    outputAudioFormat.setSampleRate(48000); //8000设置采样率以对赫兹采样。 以秒为单位，每秒采集多少声音数据的频率.
+    outputAudioFormat.setSampleRate(44100); //8000设置采样率以对赫兹采样。 以秒为单位，每秒采集多少声音数据的频率.
     outputAudioFormat.setChannelCount(1); //将通道数设置为通道。
     // audioFormat.setSampleSize(16);     /*将样本大小设置为指定的sampleSize（以位为单位）通常为8或16，但是某些系统可能支持更大的样本量。*/
     outputAudioFormat.setSampleFormat(QAudioFormat::Int16);
@@ -98,11 +102,9 @@ void AudioHandler::initializeOutPutAudio(const QAudioDevice &deviceInfo)
     const int toneSampleRateHz = 600;
     outputDevice.reset(new AudioOutputDevices(outputAudioFormat, durationSeconds * 1000000, toneSampleRateHz));
     audioOutputsource.reset(new QAudioSink(deviceInfo, outputAudioFormat));
+
+
 }
-
-
-
-
 
 
 void AudioHandler::playAudio(const QByteArray &audioData)
@@ -150,6 +152,15 @@ void AudioHandler::playAudio(const QByteArray &audioData)
 }
 
 
+void AudioHandler::playAudio_pull(const QByteArray audioData)
+{
+    m_audioOutputByteArryaData = audioData;
+    if (!audioData.isEmpty())
+    {
+        startAudioOutput();
+    }
+}
+
 void AudioHandler::handleStateChanged(QAudio::State newState)
 {
     switch (newState)
@@ -188,31 +199,44 @@ void AudioHandler::calculateRms(const QByteArray &audioData)
         sum += qPow(data[i], 2);
     }
 
-    double rms = qSqrt(sum / sampleCount);
+    rms = qSqrt(sum / sampleCount);
+
+    if(rms<20){
+        rms = 20;
+    }
+    double dBValue = 20 * std::log10(rms);
+    constexpr double minDb = 24;
+    constexpr double maxDb = 70.0;
+    // Normalize decibel value to 0 - 1 range
+    double normalizedVolume = (dBValue - minDb) / (maxDb - minDb);
+    normalizedVolume = clamp(normalizedVolume, 0.0, 1.0);
+
     APP_LOG_DEBUG("RMS:" << rms);
+    APP_LOG_DEBUG("normalizedVolume:" << normalizedVolume);
 }
 
+template<typename T>
+T AudioHandler::clamp(const T& value, const T& low, const T& high)
+{
+    return std::max(low, std::min(value, high));
+}
 
 
 void AudioHandler::onOutputNotify()
 {
-    if(m_audioOutputByteArryaData.size() == 0){
-        qDebug() << "m_audioOutputByteArryaData<0 ";
-            return;
-    }
+    // if(m_audioOutputByteArryaData.size() == 0){
+    //     qDebug() << "m_audioOutputByteArryaData<0 ";
+    //     // stopAudioOutput();
+    //     qDebug() << "audioOutputsource->state() "<<audioOutputsource->state();
+    //     return;
+    // }
     qDebug() << "m_audioOutputByteArryaData大小:" << m_audioOutputByteArryaData.size();
-
-           // auto io = audioOutputsource->start();
-           // int len = audioOutputsource->bytesFree();
-           // qDebug() << "len:" << len;
-           // len = io->write(m_audioOutputByteArryaData.data(), m_audioOutputByteArryaData.size());
 
     int len = audioOutputsource->bytesFree();
     qDebug() << "len:" << len;
     calculateRms(m_audioOutputByteArryaData);
-    // len = m_output->write(m_audioOutputByteArryaData.data(), m_audioOutputByteArryaData.size());
-    // m_audioOutputByteArryaData.clear();
-    //test
+
+    //test 将十六进制字符串转换为字节数组
     if (len > 0)
     {
         QByteArray dataToWrite = m_audioOutputByteArryaData.left(len);
@@ -221,10 +245,27 @@ void AudioHandler::onOutputNotify()
         qDebug()<<"剩余大小:: "<<m_audioOutputByteArryaData.size();
     }
 
-    if (m_audioOutputByteArryaData.isEmpty())
+    //audioOutputByteArryaData<0 读取完毕 ==>但是可能设备还没播放完音频 需要判断
+    if(m_audioOutputByteArryaData.size()<=0)
     {
-        m_outputTimer->stop();
-        stopAudioOutput();
+        switch (audioOutputsource->state())
+        {
+        case QAudio::State::IdleState:
+            qDebug() << "QAudio State==>IdleState";
+            stopAudioOutput();
+            break;
+        case QAudio::State::ActiveState:
+            qDebug() << "QAudio State==>ActiveState";
+            break;
+        case QAudio::State::StoppedState:
+            qDebug() << "QAudio State==>StoppedState";
+            break;
+        case QAudio::State::SuspendedState:
+                qDebug() << "QAudio State==>SuspendedState";
+                break;
+        default:
+            break;
+        }
     }
 
 }
@@ -284,7 +325,7 @@ void AudioHandler::startAudioInput()
     {
         inputDevice->start();
         audioInputsource->start(inputDevice.data());
-        m_inputTimer->start(10);
+        input_timer->start(10);
         // connect(inputDevice, &QIODevice::readyRead, this, &AudioHandler::onNotify);
     }
 }
@@ -293,7 +334,7 @@ void AudioHandler::stopAudioInput()
 {
     if (audioInputsource)
     {
-        m_inputTimer->stop();
+        input_timer->stop();
         audioInputsource->stop();
     }
 }
@@ -303,13 +344,13 @@ void AudioHandler::startAudioOutput()
     qDebug() << "onstartListening";
     outputDevice->start();
     m_output = audioOutputsource->start();
-    m_outputTimer->start(10);
+    output_timer->start(10);
 }
 
 void AudioHandler::stopAudioOutput()
 {
-    qDebug() << "onstopListening";
-    m_outputTimer->stop();
+    qDebug() << "stopAudioOutput";
+    output_timer->stop();
     outputDevice->stop();
     audioOutputsource->stop();
 }

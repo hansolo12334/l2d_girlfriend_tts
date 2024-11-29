@@ -13,6 +13,8 @@
 #include <Type/csmRectF.hpp>
 #include <Rendering/OpenGL/CubismOffscreenSurface_OpenGLES2.hpp>
 
+// #include<CubismMotionManager.hpp>
+
 #include "LAppWavFileHandler.hpp"
 
 /**
@@ -115,6 +117,9 @@ public:
      */
     Csm::Rendering::CubismOffscreenFrame_OpenGLES2& GetRenderBuffer();
 
+    //hansolo 设置嘴巴张合
+    void set_lipSynclValue(Csm::csmFloat32 value);
+
 protected:
     /**
      *  @brief  モデルを描画する処理。モデルを描画する空間のView-Projection行列を渡す。
@@ -188,6 +193,9 @@ private:
     };
     Csm::csmVector<hitArea_single> _hitAreas;
     Csm::csmVector<Csm::csmRectF> _userArea;
+    Csm::csmFloat32 mouse_user_value = 0;
+    // CubismMotionManager*    _mouthMotionManager;　// <<< 嘴型管理器
+
 
     const Csm::CubismId* _idParamAngleX; ///< パラメータID: ParamAngleX
     const Csm::CubismId* _idParamAngleY; ///< パラメータID: ParamAngleX
@@ -195,6 +203,9 @@ private:
     const Csm::CubismId* _idParamBodyAngleX; ///< パラメータID: ParamBodyAngleX
     const Csm::CubismId* _idParamEyeBallX; ///< パラメータID: ParamEyeBallX
     const Csm::CubismId* _idParamEyeBallY; ///< パラメータID: ParamEyeBallXY
+
+    const Csm::CubismId *_idParamMouthOpenY; //hansolo 嘴部位置
+    const Csm::CubismId *_idParamMouthOpenY2; //hansolo 嘴部位置2
 
     LAppWavFileHandler _wavFileHandler; ///< wavファイルハンドラ
 

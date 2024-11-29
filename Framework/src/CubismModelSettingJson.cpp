@@ -11,6 +11,8 @@
 #include "Id/CubismId.hpp"
 #include "Id/CubismIdManager.hpp"
 
+#include <iostream>
+
 namespace Live2D { namespace Cubism { namespace Framework {
 
 /**
@@ -163,6 +165,8 @@ csmBool CubismModelSettingJson::IsExistLipSyncParameters() const
 {
     if (_jsonValue[FrequentNode_Groups]->IsNull() || _jsonValue[FrequentNode_Groups]->IsError())
     {
+        std::cerr << "jsonValue[FrequentNode_Groups]->IsNull() "<<_jsonValue[FrequentNode_Groups]->IsNull() << std::endl;
+        std::cerr << "_jsonValue[FrequentNode_Groups]->IsError() "<<_jsonValue[FrequentNode_Groups]->IsError() << std::endl;
         return false;
     }
 
@@ -412,6 +416,7 @@ CubismIdHandle CubismModelSettingJson::GetEyeBlinkParameterId(csmInt32 index)
 
 csmInt32 CubismModelSettingJson::GetLipSyncParameterCount()
 {
+    std::cerr << "IsExistLipSyncParameters "<<IsExistLipSyncParameters() << std::endl;
     if (!IsExistLipSyncParameters())
     {
         return 0;
