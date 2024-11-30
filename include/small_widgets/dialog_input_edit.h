@@ -15,6 +15,9 @@
 #include "ElaLineEdit.h"
 #include "ElaIconButton.h"
 
+#include"sence_voice_webserver_api.h"
+#include "media_manager.h"
+
 class dialogInputEdit : public QWidget
 {
 Q_OBJECT
@@ -36,8 +39,14 @@ private:
     bool m_dragging = false;
     QPoint m_dragPosition;
 
+    bool start_talkong = false;
+    senceVoiceWebServerApi *senceVoice_ws = nullptr;
+    AudioHandler *_audio_handle = nullptr;
+
 private:
     Q_SLOT void inputTextEvent();
+    Q_SLOT void connectToSenceVoiceWebserver();
+    Q_SLOT void auto_process_tts_ollam(QString text);
 
 Q_SIGNALS:
     void audio_rms(double rms);

@@ -12,7 +12,8 @@
 #include "app_config.h"
 #include "LAppPal.hpp"
 
-AudioHandler::AudioHandler()
+AudioHandler::AudioHandler(QObject *parent)
+ : QObject(parent)
 {
     if (!isInit)
     {
@@ -50,13 +51,14 @@ AudioHandler::AudioHandler()
 void AudioHandler::initializeInputAudio(const QAudioDevice &deviceInfo)
 {
     //设置录音的格式
-    inputAudioFormat.setSampleRate(48000); //44100 设置采样率以对赫兹采样。 以秒为单位，每秒采集多少声音数据的频率.
+    inputAudioFormat.setSampleRate(16000); //44100 设置采样率以对赫兹采样。 以秒为单位，每秒采集多少声音数据的频率.
     inputAudioFormat.setChannelCount(1); //将通道数设置为通道。
     // audioFormat.setSampleSize(16);     /*将样本大小设置为指定的sampleSize（以位为单位）通常为8或16，但是某些系统可能支持更大的样本量。*/
     inputAudioFormat.setSampleFormat(QAudioFormat::Int16);
+
     // audioFormat.setCodec("audio/pcm"); //设置编码格式
     // audioFormat.setByteOrder(QAudioFormat::LittleEndian); //样本是小端字节顺序
-    // audioFormat.setSampleType(QAudioFormat::SignedInt); //样本类型
+    // audioFormat. (QAudioFormat::SignedInt); //样本类型
 
     // ChannelConfigStereo is 2, Int16 is 2
     qDebug("sampleRate: %d, channelCount: %d, sampleFormat: %d",
@@ -72,7 +74,7 @@ void AudioHandler::initializeInputAudio(const QAudioDevice &deviceInfo)
         // qDebug() << "m_audioByteArrayData start:" << "m_audioByteArrayData size:" << m_audioByteArrayData.size() ; hansolo
         QByteArray aa(data, len);
         m_audioByteArrayData.append(aa);
-        // qDebug() << "m_audioByteArrayData final:" << "m_audioByteArrayData size:" << m_audioByteArrayData.size() ; hansolo
+        // qDebug() << "m_audioByteArrayData final:" << "m_audioByteArrayData size:" << m_audioByteArrayData.size() ; //hansolo
     });
 }
 
@@ -190,6 +192,46 @@ void AudioHandler::handleStateChanged(QAudio::State newState)
     }
 }
 
+
+
+QByteArray AudioHandler::downsampleBuffer(const QByteArray &buffer, int inputSampleRate, int outputSampleRate)
+{
+    if (outputSampleRate == inputSampleRate) {
+        return buffer;
+    }
+
+    int sampleRateRatio = inputSampleRate / outputSampleRate;
+    int newLength = buffer.size() / sampleRateRatio;
+    QByteArray result;
+    result.resize(newLength);
+
+    const int16_t *input = reinterpret_cast<const int16_t*>(buffer.constData());
+    int16_t *output = reinterpret_cast<int16_t*>(result.data());
+
+    for (int i = 0, j = 0; i < newLength; ++i, j += sampleRateRatio) {
+        output[i] = input[j];
+    }
+
+    return result;
+}
+
+QByteArray AudioHandler::encodePCM(const QByteArray &floatData)
+{
+    int sampleBits = 16;
+    int dataLength = floatData.size() * (sampleBits / 8);
+    QByteArray buffer;
+    buffer.resize(dataLength);
+
+    const float *input = reinterpret_cast<const float*>(floatData.constData());
+    int16_t *output = reinterpret_cast<int16_t*>(buffer.data());
+
+    for (int i = 0; i < floatData.size() / sizeof(float); ++i) {
+        float sample = std::max(-1.0f, std::min(1.0f, input[i]));
+        output[i] = static_cast<int16_t>(sample < 0 ? sample * 0x8000 : sample * 0x7FFF);
+    }
+
+    return buffer;
+}
 
 void AudioHandler::predProcessData(QByteArray audioData)
 {
@@ -380,13 +422,6 @@ T AudioHandler::clamp(const T& value, const T& low, const T& high)
 
 void AudioHandler::onOutputNotify()
 {
-    // if(m_audioOutputByteArryaData.size() == 0){
-    //     qDebug() << "m_audioOutputByteArryaData<0 ";
-    //     // stopAudioOutput();
-    //     qDebug() << "audioOutputsource->state() "<<audioOutputsource->state();
-    //     return;
-    // }
-    // qDebug() << "m_audioOutputByteArryaData大小:" << m_audioOutputByteArryaData.size();
 
     int len = audioOutputsource->bytesFree();
     // qDebug() << "len:" << len;
@@ -403,7 +438,7 @@ void AudioHandler::onOutputNotify()
         emit playAudioRms(_lastRms);
 
         m_audioOutputByteArryaData.remove(0, written);
-        // qDebug()<<"剩余大小:: "<<m_audioOutputByteArryaData.size();
+       \
     }
 
     //audioOutputByteArryaData<0 读取完毕 ==>但是可能设备还没播放完音频 需要判断
@@ -412,11 +447,11 @@ void AudioHandler::onOutputNotify()
         switch (audioOutputsource->state())
         {
         case QAudio::State::IdleState:
-            qDebug() << "QAudio State==>IdleState";
+            // qDebug() << "QAudio State==>IdleState";
             stopAudioOutput();
             break;
         case QAudio::State::ActiveState:
-            qDebug() << "QAudio State==>ActiveState";
+            // qDebug() << "QAudio State==>ActiveState";
             break;
         case QAudio::State::StoppedState:
             qDebug() << "QAudio State==>StoppedState";
@@ -438,17 +473,25 @@ void AudioHandler::onInputNotify()
     if (inputDevice)
     {
         //hansolo
-        m_audioOutputByteArryaData.append(m_audioByteArrayData);
+        m_audioInputByteArryaData.append(m_audioByteArrayData);
         m_audioByteArrayData.clear();
+        input_time += 10;
+        if(input_time>=500){
+            input_time = 0;
+            emit singalAudioSend(m_audioInputByteArryaData);
+            m_audioInputByteArryaData.clear();
+        }
     }
-
 }
 
 
 void AudioHandler::onStartTalking()
 {
+
     qDebug() << "onStartTalking";
     stopAudioOutput(); //hansolo
+
+    m_audioInputByteArryaData.clear();
     startAudioInput();
     // emit signalRequestTalk(CMDTYPE::CMDTALK);
 }
@@ -462,10 +505,10 @@ void AudioHandler::onStopTalking()
 
     //test
     stopAudioInput();
-    qDebug()<<"m_audioByteArrayData.isEmpty() "<<m_audioByteArrayData.isEmpty();
-    recordedAudioData = m_audioOutputByteArryaData;
-    m_audioByteArrayData.clear();
-
+    // qDebug()<<"m_audioByteArrayData.isEmpty() "<<m_audioByteArrayData.isEmpty();
+    recordedAudioData = m_audioInputByteArryaData;
+    qDebug()<<"recordedAudioData.isEmpty() "<<recordedAudioData.isEmpty();
+    qDebug()<<"recordedAudioData.size()) "<<recordedAudioData.size();
 }
 
 
@@ -502,7 +545,7 @@ void AudioHandler::stopAudioInput()
 
 void AudioHandler::startAudioOutput()
 {
-    qDebug() << "onstartListening";
+    // qDebug() << "onstartListening";
     outputDevice->start();
     m_output = audioOutputsource->start();
     output_timer->start(10);

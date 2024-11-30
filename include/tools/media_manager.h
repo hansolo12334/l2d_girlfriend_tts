@@ -20,11 +20,12 @@ class AudioHandler : public QObject
     Q_OBJECT
 
 public:
-    static AudioHandler &instance()
-    {
-        static AudioHandler instance;
-        return instance;
-    }
+    // static AudioHandler &instance()
+    // {
+    //     static AudioHandler instance;
+    //     return instance;
+    // }
+    explicit AudioHandler(QObject *parent=nullptr);
 
     void playAudio(const QByteArray &audioData);
     void playAudio_pull(const QByteArray audioData);
@@ -37,6 +38,9 @@ public:
         return isOutputFinish;
     }
 
+    QByteArray getInputAudioData(){
+        return recordedAudioData;
+    }
 
 
 private:
@@ -47,6 +51,8 @@ private:
 
     QTimer *output_timer = nullptr;
     QTimer *input_timer = nullptr;
+
+    int input_time = 0;
 
 
     QScopedPointer<AudioInputDevices> inputDevice;
@@ -62,6 +68,7 @@ private:
 
     QByteArray m_audioByteArrayData;
     QByteArray m_audioOutputByteArryaData;
+    QByteArray m_audioInputByteArryaData;
     QByteArray recordedAudioData;
 
     bool isInit = false;
@@ -85,6 +92,10 @@ private:
     void startAudioInput();
     void stopAudioInput();
 
+    //降采样输入数据
+    QByteArray downsampleBuffer(const QByteArray &buffer, int inputSampleRate, int outputSampleRate);
+    QByteArray encodePCM(const QByteArray &floatData);
+
     void predProcessData(QByteArray audioData);
     void predProcessData1(QByteArray audioData);
     void calculateRms(const QByteArray &audioData);
@@ -98,16 +109,20 @@ private:
     Q_SLOT void onInputNotify();
 
 public:
-    Q_SLOT void onStartTalking();
-    Q_SLOT void onStopTalking();
+    // Q_SLOT void onStartTalking();
+    // Q_SLOT void onStopTalking();
+    void onStartTalking();
+    void onStopTalking();
+
     Q_SLOT void playRecordedAudio();
 
 Q_SIGNALS:
     void signalAudioLevel(qreal value);
     void playAudioRms(double value);
+    void singalAudioSend(QByteArray data);
 
-private:
-    AudioHandler();
+    // private:
+    //     AudioHandler();
 };
 
 

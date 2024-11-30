@@ -101,13 +101,34 @@ public:
         return instance;
     }
 
-    bool send_message_to_server(Ollama::OllamaRequest request,QString &text);
+    Ollama::OllamaRequest ollama_request;
+
+    bool send_message_to_server(QString &text);
 
     bool parseResponse(QNetworkReply *reply);
 
     void set_ollama_url(QString url);
 
-private:
+    void set_model(QString model_name){
+        ollama_request.model = model_name;
+    }
+    void set_stream(bool  value){
+        ollama_request.stream = value;
+    }
+
+    void set_message_assistant(QString message){
+        ollama_request.messages[0].content = message;
+    }
+    void set_token_size(int value){
+        ollama_request.options.num_predict = value;
+    }
+
+    void add_message(Ollama_messages message){
+        ollama_request.messages.append(message);
+    }
+
+
+private :
     bool isInit = false;
     QNetworkAccessManager *manager = nullptr;
 
@@ -121,6 +142,7 @@ private:
         {
             isInit = true;
             manager = new QNetworkAccessManager(this);
+            ollama_request.messages.append(Ollama_messages("assistant", ""));
         }
     }
     ~OllamaAPI(){}

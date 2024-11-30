@@ -6,9 +6,10 @@ namespace Ollama
 {
 
 
-bool OllamaAPI::send_message_to_server(Ollama::OllamaRequest request, QString &text)
+bool OllamaAPI::send_message_to_server(QString &text)
 {
-    QJsonObject requestJson = request.toJson();
+    APP_LOG_DEBUG("send_message_to_ollama_server");
+    QJsonObject requestJson = ollama_request.toJson();
     QJsonDocument requestJsonDoc(requestJson);
 
     QUrl url(ollam_url);
@@ -40,6 +41,7 @@ bool OllamaAPI::send_message_to_server(Ollama::OllamaRequest request, QString &t
         }
     }
     text = _receiving_txt;
+    ollama_request.messages.append(Ollama_messages("assistant", _receiving_txt));
     return true;
 }
 
@@ -80,7 +82,7 @@ bool OllamaAPI::parseResponse(QNetworkReply *reply)
                     if (messageObject.contains("content") && messageObject["content"].isString())
                     {
                         QString content = messageObject["content"].toString();
-                        // APP_LOG_DEBUG(content);
+                        // APP_LOG_DEBUG(_receiving_txt);
                         _receiving_txt += content;
                     }
                 }

@@ -23,7 +23,9 @@
 
 
 dialogInputEdit::dialogInputEdit(QWidget *parent)
- :QWidget(parent)
+ : QWidget(parent)
+ , senceVoice_ws(new senceVoiceWebServerApi())
+ , _audio_handle(new AudioHandler())
 {
     auto viewId = this->winId();
     DWM_BLURBEHIND bb = { 0 };
@@ -60,6 +62,7 @@ dialogInputEdit::dialogInputEdit(QWidget *parent)
     _voiceInputBt->setFixedWidth(60);
     _voiceInputBt->setLightHoverColor(ElaThemeColor(ElaThemeType::Light, PrimaryHover));
     _voiceInputBt->autoFillBackground();
+    connect(_voiceInputBt, &ElaIconButton::clicked, this, &dialogInputEdit::connectToSenceVoiceWebserver);
 
 
     ElaSlider *tokenSize_slider = new ElaSlider(this);
@@ -141,39 +144,48 @@ void dialogInputEdit::mouseReleaseEvent(QMouseEvent *event)
 
 void dialogInputEdit::inputTextEvent()
 {
-    // if (_inputLineEdt->text().isEmpty()){
-    //     return;
-    // }
+    if (_inputLineEdt->text().isEmpty()){
+        return;
+    }
 
     // Ollama::OllamaRequest ollama_request;
+
+
+    Ollama::OllamaAPI::instance().set_model("qwen2-rp");
+    Ollama::OllamaAPI::instance().set_message_assistant(AppConfig::instance().getPromotSentence());
+    Ollama::OllamaAPI::instance().set_token_size(AppConfig::instance().getTokenSize());
+    Ollama::OllamaAPI::instance().set_stream(true);
     // ollama_request.model = "qwen2-rp";
     // ollama_request.stream = true;
 
     // ollama_request.options.num_predict = AppConfig::instance().getTokenSize();
 
     // Ollama::Ollama_messages message_a{"assistant", AppConfig::instance().getPromotSentence()};
-    // // message_a.role = "assistant";
-    // // message_a.content = "亲爱的，我是你的性感女友，我会为了你做任何事情。";
-    // Ollama::Ollama_messages message_u{"user", _inputLineEdt->text()};
-    // // message_u.role = "user";
-    // // message_u.content = plainTextEdit1->toPlainText();
+
+    // message_a.role = "assistant";
+    // message_a.content = "亲爱的，我是你的性感女友，我会为了你做任何事情。";
+    Ollama::Ollama_messages message_u{"user", _inputLineEdt->text()};
+
+    Ollama::OllamaAPI::instance().add_message(message_u);
+    // message_u.role = "user";
+    // message_u.content = plainTextEdit1->toPlainText();
 
     // ollama_request.messages.append(message_a);
     // ollama_request.messages.append(message_u);
 
 
-    // QString re_message = "";
-    // bool re = Ollama::OllamaAPI::instance().send_message_to_server(ollama_request, re_message);
+    QString re_message = "";
+    bool re = Ollama::OllamaAPI::instance().send_message_to_server(re_message);
 
-    // if(re){
-    //     APP_LOG_DEBUG(re_message);
-    // }
+    if(re){
+        APP_LOG_DEBUG(re_message);
+    }
 
     // tts
     TTS::ServeTTSRequest tts_request;
 
-    // tts_request.text = re_message.remove("\\r").remove("\\n");
-    tts_request.text = _inputLineEdt->text().remove("\\r").remove("\\n");
+    tts_request.text = re_message.remove("\\r").remove("\\n");
+    // tts_request.text = _inputLineEdt->text().remove("\\r").remove("\\n");
     // "合成所需的音频并流式返回";
     APP_LOG_DEBUG("request.text " << tts_request.text);
     // request.references.append(ServeReferenceAudio("audio1", "text1"));
@@ -197,8 +209,122 @@ void dialogInputEdit::inputTextEvent()
 
     if(tts_re){
         // AudioHandler::instance().playAudio(response_data);
-        AudioHandler::instance().playAudio_pull(response_data);
-        connect(&AudioHandler::instance(), &AudioHandler::playAudioRms, this, [&](double value) {
+        _audio_handle->playAudio_pull(response_data);
+        connect(_audio_handle, &AudioHandler::playAudioRms, this, [&](double value) {
+            Live2D::Cubism::Framework::csmFloat32 vv = static_cast<Live2D::Cubism::Framework::csmFloat32>(value);
+            LAppLive2DManager::GetInstance()->user_lipSync(vv);
+
+        });
+    }
+}
+
+
+void dialogInputEdit::connectToSenceVoiceWebserver()
+{
+
+    if(!senceVoice_ws->isConnect()){
+        APP_LOG_DEBUG("connectToSenceVoiceWebserver!");
+        senceVoice_ws->connectToServer();
+    }
+
+    if(!start_talkong)
+    {
+        start_talkong = true;
+        _audio_handle->onStartTalking();
+        connect(_audio_handle, &AudioHandler::singalAudioSend, senceVoice_ws, &senceVoiceWebServerApi::sendVoiceMsg);
+        connect(senceVoice_ws, &senceVoiceWebServerApi::RecvTextMsg, this,&dialogInputEdit::auto_process_tts_ollam);
+    }
+    else
+    {
+        start_talkong = false;
+        _audio_handle->onStopTalking();
+
+        // QByteArray re= _audio_handle->getInputAudioData();
+
+
+        // APP_LOG_DEBUG("re data size :"<<re.size());
+        // APP_LOG_DEBUG("format: "<<*reinterpret_cast<const quint16 *>(re.mid(20, 2).data()));
+        // senceVoice_ws->sendVoiceMsg(re);
+        // _audio_handle->playAudio_pull(re);
+    }
+}
+
+void dialogInputEdit::auto_process_tts_ollam(QString text)
+{
+    if (text.isEmpty()){
+        return;
+    }
+
+    // Ollama::OllamaRequest ollama_request;
+    // ollama_request.model = "qwen2-rp";
+    // ollama_request.stream = true;
+
+    // ollama_request.options.num_predict = AppConfig::instance().getTokenSize();
+
+    // Ollama::Ollama_messages message_a{"assistant", AppConfig::instance().getPromotSentence()};
+    // // message_a.role = "assistant";
+    // // message_a.content = "亲爱的，我是你的性感女友，我会为了你做任何事情。";
+    // Ollama::Ollama_messages message_u{"user", text};
+    // // message_u.role = "user";
+    // // message_u.content = plainTextEdit1->toPlainText();
+
+    // ollama_request.messages.append(message_a);
+    // ollama_request.messages.append(message_u);
+
+    Ollama::OllamaAPI::instance().set_model("qwen2-rp");
+    Ollama::OllamaAPI::instance().set_message_assistant(AppConfig::instance().getPromotSentence());
+    Ollama::OllamaAPI::instance().set_token_size(AppConfig::instance().getTokenSize());
+    // ollama_request.model = "qwen2-rp";
+    // ollama_request.stream = true;
+
+    // ollama_request.options.num_predict = AppConfig::instance().getTokenSize();
+
+    // Ollama::Ollama_messages message_a{"assistant", AppConfig::instance().getPromotSentence()};
+
+    // message_a.role = "assistant";
+    // message_a.content = "亲爱的，我是你的性感女友，我会为了你做任何事情。";
+    Ollama::Ollama_messages message_u{"user", text};
+
+    Ollama::OllamaAPI::instance().add_message(message_u);
+
+    QString re_message = "";
+    bool re = Ollama::OllamaAPI::instance().send_message_to_server(re_message);
+
+    re_message=re_message.remove("\\r").remove("\\n");
+    if(re){
+        APP_LOG_DEBUG(re_message);
+    }
+
+    // tts
+    TTS::ServeTTSRequest tts_request;
+
+    tts_request.text = re_message.remove("\\r").remove("\\n");
+
+    // "合成所需的音频并流式返回";
+    APP_LOG_DEBUG("request.text " << tts_request.text);
+    // request.references.append(ServeReferenceAudio("audio1", "text1"));
+    // request.references.append(ServeReferenceAudio("audio2", "text2"));
+    tts_request.reference_id = QString::number(AppConfig::instance().getTTsVoiceChoise());
+    tts_request.normalize = true;
+    tts_request.format = "wav";
+    tts_request.mp3_bitrate = 64;
+    tts_request.opus_bitrate = -1000;
+    tts_request.max_new_tokens = 0;
+    tts_request.chunk_length = 200;
+    tts_request.top_p = 0.7f;
+    tts_request.repetition_penalty = 1.2f;
+    tts_request.temperature = 0.7f;
+    tts_request.streaming = true;
+    tts_request.use_memory_cache = "never";
+    tts_request.seed = std::nullopt;
+
+    QByteArray response_data;
+    bool tts_re=TTS::TTSAPI::instance().send_message_to_server(tts_request, response_data);
+
+    if(tts_re){
+        // AudioHandler::instance().playAudio(response_data);
+        _audio_handle->playAudio_pull(response_data);
+        connect(_audio_handle, &AudioHandler::playAudioRms, this, [&](double value) {
             Live2D::Cubism::Framework::csmFloat32 vv = static_cast<Live2D::Cubism::Framework::csmFloat32>(value);
             LAppLive2DManager::GetInstance()->user_lipSync(vv);
 
