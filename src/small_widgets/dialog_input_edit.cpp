@@ -21,6 +21,7 @@
 #include"LAppModel.hpp"
 #include <CubismDefaultParameterId.hpp>
 
+
 dialogInputEdit::dialogInputEdit(QWidget *parent)
  :QWidget(parent)
 {
@@ -197,6 +198,10 @@ void dialogInputEdit::inputTextEvent()
     if(tts_re){
         // AudioHandler::instance().playAudio(response_data);
         AudioHandler::instance().playAudio_pull(response_data);
-    }
+        connect(&AudioHandler::instance(), &AudioHandler::playAudioRms, this, [&](double value) {
+            Live2D::Cubism::Framework::csmFloat32 vv = static_cast<Live2D::Cubism::Framework::csmFloat32>(value);
+            LAppLive2DManager::GetInstance()->user_lipSync(vv);
 
+        });
+    }
 }

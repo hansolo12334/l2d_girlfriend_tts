@@ -39,6 +39,9 @@ private:
 private:
     Q_SLOT void inputTextEvent();
 
+Q_SIGNALS:
+    void audio_rms(double rms);
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

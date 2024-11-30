@@ -10,7 +10,7 @@
 
 
 #include "app_config.h"
-
+#include "LAppPal.hpp"
 
 AudioHandler::AudioHandler()
 {
@@ -154,6 +154,8 @@ void AudioHandler::playAudio(const QByteArray &audioData)
 
 void AudioHandler::playAudio_pull(const QByteArray audioData)
 {
+    predProcessData1(audioData);
+    APP_LOG_DEBUG("audioData.size " << audioData.size());
     m_audioOutputByteArryaData = audioData;
     if (!audioData.isEmpty())
     {
@@ -188,31 +190,185 @@ void AudioHandler::handleStateChanged(QAudio::State newState)
     }
 }
 
-void AudioHandler::calculateRms(const QByteArray &audioData)
-{
-    const int16_t *data = reinterpret_cast<const int16_t *>(audioData.constData());
-    int sampleCount = audioData.size() / sizeof(int16_t);
 
-    double sum = 0;
+void AudioHandler::predProcessData(QByteArray audioData)
+{
+    // int sampleRate = *reinterpret_cast<const int*>(&audioData[24]);  // 采样率（通常在字节24-27位置）
+    // int numChannels = *reinterpret_cast<const short*>(&audioData[22]); // 通道数（通常在字节22-23位置）
+    // int bitsPerSample = *reinterpret_cast<const short*>(&audioData[34]); //
+    // qDebug() << "Sample Rate:" << sampleRate;
+    // qDebug() << "Channels:" << numChannels;
+    // qDebug() << "Bits per Sample:" << bitsPerSample;
+
+    // // 读取音频数据部分：跳过44字节的WAV头部
+    // const int16_t *data = reinterpret_cast<const int16_t *>(audioData.constData() + 44);
+    // int sampleCount = (audioData.size() - 44) / sizeof(int16_t);
+
+    // // 归一化音频数据，将16位音频数据从[-32768, 32767]映射到[-1.0, 1.0]
+    // // QFile file("rms_values.txt");
+    // // file.open(QIODevice::Append | QIODevice::Text);
+    // // QTextStream out(&file);
+
+    // normalizedData.clear();
+    // for (int i = 0; i < sampleCount; ++i)
+    // {
+    //     // normalizedData[i] = static_cast<float>(data[i]+16384) / 32768.0f;
+    //     normalizedData.push_back(static_cast<float>(data[i] + 16384) / 32768.0f);
+    //     // out << normalizedData[i] << "\n";
+    // }
+
+
+    // const int16_t *data = reinterpret_cast<const int16_t *>(audioData.constData());
+    // int sampleCount = audioData.size() / sizeof(int16_t);  // 获取当前数据片段的样本数
+    // qDebug()<<"sampleCount " << sampleCount;
+
+    // normalizedData.clear();
+
+
+    // // 累加样本的平方值
+    // for (int i = 0; i < sampleCount; ++i) {
+    //     normalizedData.push_back(static_cast<float>(data[i] + 16384) / 32768.0f);
+    // }
+
+    for (int j = 0; j < audioData.size(); j++)
+    {
+        auto te = audioData[j];
+        if(te>max_value){
+            max_value = te;
+        }
+    }
+    qDebug() << "maxvalue " << max_value;
+}
+
+void AudioHandler::predProcessData1(QByteArray audioData)
+{
+    start = 0;
+
+    const int16_t *data = reinterpret_cast<const int16_t *>(audioData.constData());
+    int sampleCount = (audioData.size()) / sizeof(int16_t);
+    normalizedData.clear();
+
+    // QFile file("rms_values.txt");
+    // file.open(QIODevice::Append | QIODevice::Text);
+    // QTextStream out(&file);
     for (int i = 0; i < sampleCount; ++i)
     {
-        sum += qPow(data[i], 2);
+        // normalizedData[i] = static_cast<float>(data[i]+16384) / 32768.0f;
+        // normalizedData.push_back(static_cast<float>(data[i] + 16384) / 32768.0f);
+        normalizedData.push_back(static_cast<float>(data[i]) / 32768.0f);
+        // out << normalizedData[i] << "\n";
+    }
+    // file.close();
+}
+
+
+void AudioHandler::calculateRms(int len)
+{
+    float rms = 0.0f;
+
+    int end = start + len/ 2;
+    for (int i = start; i < end; ++i)
+    {
+        rms += normalizedData[i] * normalizedData[i];
     }
 
-    rms = qSqrt(sum / sampleCount);
+    rms = sqrt(rms / (len/2));
 
-    if(rms<20){
-        rms = 20;
+    rms = rms * 10;
+    if(rms>1.0){
+        rms=1.0;
+    }else if(rms<0.1 || qIsNaN(rms)){
+        rms = 0.1;
     }
-    double dBValue = 20 * std::log10(rms);
-    constexpr double minDb = 24;
-    constexpr double maxDb = 70.0;
-    // Normalize decibel value to 0 - 1 range
-    double normalizedVolume = (dBValue - minDb) / (maxDb - minDb);
-    normalizedVolume = clamp(normalizedVolume, 0.0, 1.0);
+    _lastRms = rms;
+    start = end;
 
-    APP_LOG_DEBUG("RMS:" << rms);
-    APP_LOG_DEBUG("normalizedVolume:" << normalizedVolume);
+    QFile file("rms_values.txt");
+    if (file.open(QIODevice::Append | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << _lastRms << "\n";
+        file.close();
+    } else {
+        APP_LOG_ERROR("Unable to open file to save RMS values.");
+    }
+}
+
+
+void AudioHandler::calculateRms(const QByteArray &audioData)
+{
+
+    const int16_t *data = reinterpret_cast<const int16_t *>(audioData.constData());
+    int sampleCount = audioData.size() / sizeof(int16_t);  // 获取当前数据片段的样本数
+
+    // 计算 RMS 值
+    float rms = 0.0f;
+
+    // 累加样本的平方值
+    for (int i = 0; i < sampleCount; ++i) {
+        rms += data[i] * data[i];
+    }
+
+    // 计算平均 RMS
+    rms = sqrt(rms / sampleCount);
+
+    // rms = log(rms + 1.0f) * 1000.0f;  // 对RMS进行对数缩放，增加动态响应
+    // 设置最小 RMS 阈值
+    if (rms < 0.01f) {
+        rms = 0.01f;
+    }
+    rms = rms / 3600;
+
+    // 更新 RMS 值
+    _lastRms = rms;
+
+    // 输出调试信息
+    // qDebug() << "RMS:" << rms;
+
+    // QFile file("rms_values.txt");
+    // if (file.open(QIODevice::Append | QIODevice::Text)) {
+    //     QTextStream out(&file);
+    //     out << _lastRms << "\n";
+    //     file.close();
+    // } else {
+    //     APP_LOG_ERROR("Unable to open file to save RMS values.");
+    // }
+
+    // 输出调试信息
+
+
+    // const int16_t *data = reinterpret_cast<const int16_t *>(audioData.constData());
+    // int sampleCount = audioData.size() / sizeof(int16_t);
+
+    // double sum = 0;
+    // for (int i = 0; i < sampleCount; ++i)
+    // {
+    //     sum += qPow(data[i], 2);
+    // }
+
+    // rms = qSqrt(sum / sampleCount);
+
+    // if(rms<20){
+    //     rms = 20;
+    // }
+    // QFile file("rms_values.txt");
+    // if (file.open(QIODevice::Append | QIODevice::Text)) {
+    //     QTextStream out(&file);
+    //     out << rms << "\n";
+    //     file.close();
+    // } else {
+    //     APP_LOG_ERROR("Unable to open file to save RMS values.");
+    // }
+
+    // APP_LOG_DEBUG("RMS:" << rms);
+    // double dBValue = 20 * std::log10(rms);
+    // constexpr double minDb = 24;
+    // constexpr double maxDb = 70.0;
+    // // Normalize decibel value to 0 - 1 range
+    // normalizedVolume = (dBValue - minDb) / (maxDb - minDb);
+    // normalizedVolume = clamp(normalizedVolume, 0.0, 1.0);
+
+    // // APP_LOG_DEBUG("RMS:" << rms);
+    // // APP_LOG_DEBUG("normalizedVolume:" << normalizedVolume);
 }
 
 template<typename T>
@@ -230,19 +386,24 @@ void AudioHandler::onOutputNotify()
     //     qDebug() << "audioOutputsource->state() "<<audioOutputsource->state();
     //     return;
     // }
-    qDebug() << "m_audioOutputByteArryaData大小:" << m_audioOutputByteArryaData.size();
+    // qDebug() << "m_audioOutputByteArryaData大小:" << m_audioOutputByteArryaData.size();
 
     int len = audioOutputsource->bytesFree();
-    qDebug() << "len:" << len;
-    calculateRms(m_audioOutputByteArryaData);
+    // qDebug() << "len:" << len;
+
 
     //test 将十六进制字符串转换为字节数组
     if (len > 0)
     {
         QByteArray dataToWrite = m_audioOutputByteArryaData.left(len);
         int written = m_output->write(dataToWrite.data(), dataToWrite.size());
+
+        // calculateRms(len);
+        calculateRms(dataToWrite.size());
+        emit playAudioRms(_lastRms);
+
         m_audioOutputByteArryaData.remove(0, written);
-        qDebug()<<"剩余大小:: "<<m_audioOutputByteArryaData.size();
+        // qDebug()<<"剩余大小:: "<<m_audioOutputByteArryaData.size();
     }
 
     //audioOutputByteArryaData<0 读取完毕 ==>但是可能设备还没播放完音频 需要判断

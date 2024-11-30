@@ -30,8 +30,14 @@ public:
     void playAudio_pull(const QByteArray audioData);
 
     double get_audio_rms(){
-        return rms;
+        return _lastRms;
     }
+
+    bool isPlayFinish() {
+        return isOutputFinish;
+    }
+
+
 
 private:
     bool _isPlayingAudio = false;
@@ -59,7 +65,14 @@ private:
     QByteArray recordedAudioData;
 
     bool isInit = false;
-    double rms = 0;
+
+    double normalizedVolume = 0;
+    bool isOutputFinish = true;
+
+    float _lastRms=0.0f;                  // 上一帧的 RMS 值
+    QVector<float> normalizedData;
+    int start = 0;
+    char max_value = -1000;
 
 
 private:
@@ -72,8 +85,10 @@ private:
     void startAudioInput();
     void stopAudioInput();
 
-
+    void predProcessData(QByteArray audioData);
+    void predProcessData1(QByteArray audioData);
     void calculateRms(const QByteArray &audioData);
+    void calculateRms(int len);
     template <typename T>
     T clamp(const T &value, const T &low, const T &high);
 
@@ -89,6 +104,7 @@ public:
 
 Q_SIGNALS:
     void signalAudioLevel(qreal value);
+    void playAudioRms(double value);
 
 private:
     AudioHandler();
