@@ -184,7 +184,7 @@ void dialogInputEdit::inputTextEvent()
     // tts
     TTS::ServeTTSRequest tts_request;
 
-    tts_request.text = re_message.remove("\\r").remove("\\n");
+    tts_request.text = re_message.simplified();
     // tts_request.text = _inputLineEdt->text().remove("\\r").remove("\\n");
     // "合成所需的音频并流式返回";
     APP_LOG_DEBUG("request.text " << tts_request.text);
@@ -290,7 +290,7 @@ void dialogInputEdit::auto_process_tts_ollam(QString text)
     QString re_message = "";
     bool re = Ollama::OllamaAPI::instance().send_message_to_server(re_message);
 
-    re_message=re_message.remove("\\r").remove("\\n");
+    re_message=re_message.simplified();
     if(re){
         APP_LOG_DEBUG(re_message);
     }
@@ -298,7 +298,7 @@ void dialogInputEdit::auto_process_tts_ollam(QString text)
     // tts
     TTS::ServeTTSRequest tts_request;
 
-    tts_request.text = re_message.remove("\\r").remove("\\n");
+    tts_request.text = re_message.simplified();
 
     // "合成所需的音频并流式返回";
     APP_LOG_DEBUG("request.text " << tts_request.text);

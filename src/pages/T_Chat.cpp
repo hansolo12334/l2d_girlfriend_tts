@@ -272,7 +272,7 @@ void T_Chat::send_requests_to_tts(QString data)
     APP_LOG_DEBUG("send to tts!");
     ServeTTSRequest request;
 
-    request.text = data.remove("\\r").remove("\\n");
+    request.text = data.simplified();
     // qDebug() << "request.text " << request.text;
     // "合成所需的音频并流式返回";
 
@@ -351,7 +351,7 @@ bool T_Chat::send_requests_to_tts_after_ollama_auto()
     ServeTTSRequest request;
 
 
-    request.text = current_receiveText->text().remove("\\r").remove("\\n");
+    request.text = current_receiveText->text().simplified();
     // "合成所需的音频并流式返回";
     APP_LOG_DEBUG("request.text " << request.text);
     // request.references.append(ServeReferenceAudio("audio1", "text1"));
@@ -470,7 +470,7 @@ bool T_Chat::send_requests_to_ollama()
     parseResponse(reply);
 
     loop.exec();
-    current_receiveText->setText(receiving_txt.remove("\\r").remove("\n"));
+    current_receiveText->setText(receiving_txt.simplified());
 
     if (!AppConfig::instance().isEnableTTS())
     {

@@ -158,6 +158,8 @@ void AudioHandler::playAudio_pull(const QByteArray audioData)
 {
     predProcessData1(audioData);
     APP_LOG_DEBUG("audioData.size " << audioData.size());
+    m_audioOutputByteArryaData.clear();
+    m_audioOutputByteArryaData.shrink_to_fit();
     m_audioOutputByteArryaData = audioData;
     if (!audioData.isEmpty())
     {
@@ -438,7 +440,7 @@ void AudioHandler::onOutputNotify()
         emit playAudioRms(_lastRms);
 
         m_audioOutputByteArryaData.remove(0, written);
-       \
+
     }
 
     //audioOutputByteArryaData<0 读取完毕 ==>但是可能设备还没播放完音频 需要判断
@@ -546,15 +548,20 @@ void AudioHandler::stopAudioInput()
 void AudioHandler::startAudioOutput()
 {
     // qDebug() << "onstartListening";
-    outputDevice->start();
     m_output = audioOutputsource->start();
     output_timer->start(10);
+    outputDevice->start();
+
+
 }
 
 void AudioHandler::stopAudioOutput()
 {
     qDebug() << "stopAudioOutput";
-    output_timer->stop();
+
     outputDevice->stop();
     audioOutputsource->stop();
+
+    output_timer->stop();
+    initializeOutPutAudio(m_outputMediaDevices->defaultAudioOutput());
 }
