@@ -49,10 +49,14 @@ main_window::main_window(QWidget *parent) : ElaWindow(parent)
         }
     });
 
+    _live2dWidget = new T_live2d();
+
+
+
     init_sysTrayMenu();
     _sysTrayIcon->show();
 
-    _live2dWidget = new T_live2d();
+
     _live2dWidget->show();
 }
 
@@ -130,8 +134,10 @@ void main_window::init_sysTrayMenu()
     _enableFixL2dWindow = new QAction(this);
     if(resource_loader::get_instance().moveable()){
         _enableFixL2dWindow->setText("固定L2d");
+        _live2dWidget->setWindowFlag(Qt::FramelessWindowHint,false);
     }else{
         _enableFixL2dWindow->setText("移动L2d");
+        _live2dWidget->setWindowFlag(Qt::FramelessWindowHint,true);
     }
 
     if(resource_loader::get_instance().is_top()){
@@ -187,12 +193,16 @@ void main_window::init_sysTrayMenu()
             _enableFixL2dWindow->setText("移动L2d");
             APP_LOG_DEBUG("固定l2d");
             resource_loader::get_instance().set_moveable(false);
+            _live2dWidget->setWindowFlag(Qt::FramelessWindowHint,true);
+            _live2dWidget->show();
         }
         else
         {
             _enableFixL2dWindow->setText("固定L2d");
             APP_LOG_DEBUG("移动l2d");
             resource_loader::get_instance().set_moveable(true);
+            _live2dWidget->setWindowFlag(Qt::FramelessWindowHint,false);
+            _live2dWidget->show();
         }
     });
 

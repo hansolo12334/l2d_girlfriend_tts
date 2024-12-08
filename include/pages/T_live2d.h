@@ -4,6 +4,7 @@
 #include "glwidget.h"
 #include "hover_button.h"
 #include "dialog_input_edit.h"
+#include "T_TransparentChatScrollArea.h"
 
 #include <QCloseEvent>
 #include <QGuiApplication>
@@ -23,9 +24,13 @@ public:
     GLWidget *gl_live2dWidget;
 
     QVBoxLayout *v_layout{nullptr};
+    QHBoxLayout *h_layout{nullptr};
     HoverButton *open_dialogBt{nullptr};
     dialogInputEdit *dialog_inpit{nullptr};
+    T_TransparentChatScrollArea *trans_chat_area{nullptr};
 
+public:
+    Q_SLOT void add_bubble_input_chat(QString text);
 private:
     int pos_x{};
     int pos_y{};
@@ -43,6 +48,7 @@ protected:
 
 private:
     Q_SLOT void on_open_dialogBt_clicked();
+
 };
 
 

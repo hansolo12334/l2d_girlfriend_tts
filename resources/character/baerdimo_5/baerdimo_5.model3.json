@@ -11,21 +11,26 @@
       "File": "baerdimo_5.physics3.json"
     },
     "Motions": {
-      "touch_special": [
-        {
-          "File": "motions/touch_special.motion3.json"
-        }
-      ],
-      "touch_head": [
-        {
-          "File": "motions/touch_head.motion3.json"
-        }
-      ],
-      "touch_body": [
-        {
-          "File": "motions/touch_body.motion3.json"
-        }
-      ]
+        "Idle":[
+            {
+                "File": "motions/idle.motion3.json"
+            }
+        ],
+        "touch_special": [
+            {
+                "File": "motions/touch_special.motion3.json"
+            }
+        ],
+        "touch_head": [
+            {
+                "File": "motions/touch_head.motion3.json"
+            }
+        ],
+        "touch_body": [
+            {
+                "File": "motions/touch_body.motion3.json"
+            }
+        ]
     }
   },
   "Controllers": {

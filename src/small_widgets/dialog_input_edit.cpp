@@ -144,10 +144,21 @@ void dialogInputEdit::mouseReleaseEvent(QMouseEvent *event)
 
 void dialogInputEdit::inputTextEvent()
 {
-    if (_inputLineEdt->text().isEmpty()){
+
+    //测试弹出气泡
+    // T_AnimationBubble *chatBubble = new T_AnimationBubble(this,T_AnimationBubble::AM_Mod::AM_FADIN);
+    // chatBubble->setText(_inputLineEdt->text());
+    // chatBubble->setTextPixelSize(15);
+    // chatBubble->setMaximumWidth(300);
+    // chatBubble->setWordWrap(false);
+
+    // _mainLayout->addWidget(chatBubble);
+
+    if (_inputLineEdt->text().isEmpty())
+    {
         return;
     }
-
+    emit input_content(_inputLineEdt->text().simplified());
     // Ollama::OllamaRequest ollama_request;
 
 
@@ -164,7 +175,7 @@ void dialogInputEdit::inputTextEvent()
 
     // message_a.role = "assistant";
     // message_a.content = "亲爱的，我是你的性感女友，我会为了你做任何事情。";
-    Ollama::Ollama_messages message_u{"user", _inputLineEdt->text()};
+    Ollama::Ollama_messages message_u{"user", _inputLineEdt->text().simplified()};
 
     Ollama::OllamaAPI::instance().add_message(message_u);
     // message_u.role = "user";
@@ -179,6 +190,14 @@ void dialogInputEdit::inputTextEvent()
 
     if(re){
         APP_LOG_DEBUG(re_message);
+    }
+
+
+
+
+    if(!AppConfig::instance().isEnableTTS()){
+        APP_LOG_DEBUG("TTS 关闭");
+        return;
     }
 
     // tts

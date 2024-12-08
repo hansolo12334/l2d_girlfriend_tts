@@ -25,11 +25,16 @@
             "name": "Mark",
             "window_x": 1659,
             "window_y": 668
+        },
+        {
+            "name": "aersasi_2",
+            "window_x": 1659,
+            "window_y": 668
         }
     ],
     "userdata": {
         "current_model": "xuefeng",
         "top": true,
-        "move": true
+        "move": false
     }
 }

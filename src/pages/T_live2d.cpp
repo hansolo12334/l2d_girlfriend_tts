@@ -22,7 +22,7 @@ T_live2d::T_live2d(QWidget *parent)
     DwmEnableBlurBehindWindow((HWND)viewId, &bb);
 
     // this->setAttribute(Qt::WA_TranslucentBackground);
-    // this->setWindowFlag(Qt::FramelessWindowHint);
+    this->setWindowFlag(Qt::FramelessWindowHint);
 
     this->setWindowFlag(Qt::WindowType::MSWindowsOwnDC,false);
     this->setWindowFlag(Qt::Tool);
@@ -34,20 +34,35 @@ T_live2d::T_live2d(QWidget *parent)
 
 
     v_layout = new QVBoxLayout();
-    gl_live2dWidget=new GLWidget();
+    h_layout = new QHBoxLayout();
+
+    gl_live2dWidget = new GLWidget();
+    trans_chat_area = new T_TransparentChatScrollArea();
+
+    gl_live2dWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    trans_chat_area->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     open_dialogBt = new HoverButton();
     open_dialogBt->setFixedHeight(30);
     open_dialogBt->setOnHoverText("开启对话框");
     connect(open_dialogBt, &QPushButton::clicked, this, &T_live2d::on_open_dialogBt_clicked);
 
-    v_layout->setSpacing(0);
+    // v_layout->setSpacing(0);
     v_layout->addWidget(gl_live2dWidget);
     v_layout->addWidget(open_dialogBt);
 
     v_layout->setContentsMargins(0, 0, 0, 0);
 
-    this->setLayout(v_layout);
-    this->resize(300, 430);
+    h_layout->addWidget(trans_chat_area);
+    h_layout->addLayout(v_layout);
+    h_layout->setContentsMargins(0, 0, 0, 0);
+    h_layout->setStretch(0, 1);
+    h_layout->setStretch(1, 3);
+    this->setLayout(h_layout);
+    this->setContentsMargins(0, 0, 0, 0);
+
+    // this->setLayout(v_layout);
+    this->resize(600, 420);
 
 
     int cxScreen,cyScreen;
@@ -71,6 +86,8 @@ T_live2d::T_live2d(QWidget *parent)
 
     dialog_inpit = new dialogInputEdit();
     dialog_inpit->moveToButtom();
+
+    connect(dialog_inpit, &dialogInputEdit::input_content, this,&T_live2d::add_bubble_input_chat);
 
 }
 
@@ -166,4 +183,30 @@ void T_live2d::on_open_dialogBt_clicked()
 {
     APP_LOG_DEBUG("on_open_dialogBt_clicked");
     dialog_inpit->show();
+}
+
+void T_live2d::add_bubble_input_chat(QString text)
+{
+    APP_LOG_DEBUG("获得 输入");
+    QHBoxLayout *textLayout = new QHBoxLayout();
+    textLayout->addStretch();
+    textLayout->setAlignment(Qt::AlignRight);
+
+    T_AnimationBubble *chatBubble = new T_AnimationBubble(this,T_AnimationBubble::AM_Mod::AM_FADIN);
+    // APP_LOG_DEBUG("chat area " << this->trans_chat_area->width());
+    // chatBubble->setMaxWidth(static_cast<int>(this->trans_chat_area->width() * 0.7));
+    chatBubble->setTextPixelSize(15);
+    chatBubble->setMaxWidth(50);
+
+    chatBubble->setText(text);
+
+
+
+
+
+    textLayout->setAlignment(Qt::AlignRight);
+    textLayout->addStretch();
+    textLayout->addWidget(chatBubble);
+
+    this->trans_chat_area->add_bubble_chat(textLayout);
 }

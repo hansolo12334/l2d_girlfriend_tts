@@ -469,7 +469,7 @@ void LAppModel::Update()
         _pose->UpdateParameters(_model, deltaTimeSeconds);
     }
 
-    //嘴巴
+    //嘴巴 hansolo
     _model->AddParameterValue(CubismFramework::GetIdManager()->GetId(csmString("ParamMouthOpenY").GetRawString()), mouse_user_value, 0.8f);
 
 

@@ -17,6 +17,7 @@
 
 #include"sence_voice_webserver_api.h"
 #include "media_manager.h"
+#include "T_AnimationBubble.h"
 
 class dialogInputEdit : public QWidget
 {
@@ -50,6 +51,8 @@ private:
 
 Q_SIGNALS:
     void audio_rms(double rms);
+    void input_content(QString text);
+    void responce_content(QString text);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
