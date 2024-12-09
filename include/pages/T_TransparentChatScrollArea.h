@@ -32,8 +32,8 @@ private:
 
 
 protected:
-           // void mousePressEvent(QMouseEvent *event) override;
-           // void mouseReleaseEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
 private:
     void setWindowTransparent();

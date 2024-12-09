@@ -193,8 +193,8 @@ void T_AnimationBubble::paintEvent(QPaintEvent *event)
     QSizeF textSize = textDoc.size();
     int padding = 10;
 
-    qDebug() << "m_maxWidth " << m_maxWidth;
-    qDebug() << "textSize " << textSize;
+    // qDebug() << "m_maxWidth " << m_maxWidth;
+    // qDebug() << "textSize " << textSize;
 
     // 调整气泡大小以适应文本
     int bubbleWidth = textSize.width() + 2 * padding;

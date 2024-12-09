@@ -32,6 +32,8 @@ GLWidget::GLWidget(QWidget *parent)
 {
     this->startTimer(fps);
     mouse_global_pos=QCursor::pos();
+
+    this->setContentsMargins(0, 0, 0, 0);
 }
 
 GLWidget::~GLWidget()
@@ -52,22 +54,47 @@ void GLWidget::paintGL()
     LAppDelegate::GetInstance()->update();
 }
 
+void GLWidget::wheelEvent(QWheelEvent *event)
+{
+    // 获取滚轮滚动的角度
+    int delta = event->angleDelta().y();
+
+    // 根据滚轮滚动的方向调整缩放因子
+    if (delta > 0)
+    {
+        scaleFactor *= 1.1f; // 放大
+    }
+    else
+    {
+        scaleFactor /= 1.1f; // 缩小
+    }
+    // qDebug() << "scaleFactor " << scaleFactor;
+
+    l2d_height = l2d_height * scaleFactor;
+    l2d_width = l2d_width * scaleFactor;
+
+    // LAppDelegate::GetInstance()->resize(l2d_width, l2d_height);
+}
+
 void GLWidget::resizeGL(int width, int height)
 {
-#if 0
-    glViewport(0, 0, width, height);
+// #if 0
+//     glViewport(0, 0, width, height);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+//     glMatrixMode(GL_PROJECTION);
+//     glLoadIdentity();
 
-    double halfW = width / 2.0;
-    double halfH = height / 2.0;
-    glOrtho(-halfW, halfW, -halfH, +halfH, 4.0, 100.0);
+//     double halfW = width / 2.0;
+//     double halfH = height / 2.0;
+//     glOrtho(-halfW, halfW, -halfH, +halfH, 4.0, 100.0);
 
-    glMatrixMode(GL_MODELVIEW);
-#endif
-    //qDebug("width:%d,height:%d",width,height);
-    LAppDelegate::GetInstance()->resize(width,height);
+//     glMatrixMode(GL_MODELVIEW);
+// #endif
+    // qDebug("gl width:%d,gl height:%d",width,height);
+    // qDebug("window width:%d,window height:%d",this->width(),this->height());
+    l2d_width = width;
+    l2d_height = height;
+    LAppDelegate::GetInstance()->resize(width, height);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)

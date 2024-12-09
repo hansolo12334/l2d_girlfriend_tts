@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QCloseEvent>
 #include<QEnterEvent>
+#include<QWheelEvent>
 
 class GLWidget : public QOpenGLWidget
 {
@@ -19,6 +20,10 @@ public:
 private:
     QPoint mouse_global_pos{0,0};
     bool outSideL2d = true;
+    double scaleFactor = 1.0;
+
+    int l2d_height=0;
+    int l2d_width=0;
 
 protected:
     void initializeGL();
@@ -31,6 +36,8 @@ protected:
     void closeEvent(QCloseEvent * e) override;
     void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
+
+    void wheelEvent(QWheelEvent *event) override;
 };
 
 #endif

@@ -21,7 +21,7 @@ T_live2d::T_live2d(QWidget *parent)
     bb.fEnable = TRUE;
     DwmEnableBlurBehindWindow((HWND)viewId, &bb);
 
-    // this->setAttribute(Qt::WA_TranslucentBackground);
+    this->setAttribute(Qt::WA_TranslucentBackground);
     this->setWindowFlag(Qt::FramelessWindowHint);
 
     this->setWindowFlag(Qt::WindowType::MSWindowsOwnDC,false);
@@ -39,8 +39,10 @@ T_live2d::T_live2d(QWidget *parent)
     gl_live2dWidget = new GLWidget();
     trans_chat_area = new T_TransparentChatScrollArea();
 
+    gl_live2dWidget->setContentsMargins(0, 0, 0, 0);
     gl_live2dWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     trans_chat_area->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    // trans_chat_area->setStyleSheet("background-color:transparent;");
 
     open_dialogBt = new HoverButton();
     open_dialogBt->setFixedHeight(30);
@@ -50,12 +52,12 @@ T_live2d::T_live2d(QWidget *parent)
     // v_layout->setSpacing(0);
     v_layout->addWidget(gl_live2dWidget);
     v_layout->addWidget(open_dialogBt);
-
-    v_layout->setContentsMargins(0, 0, 0, 0);
+    v_layout->setSpacing(0);
+    v_layout->setContentsMargins(QMargins(0, 0, 0, 0));
 
     h_layout->addWidget(trans_chat_area);
     h_layout->addLayout(v_layout);
-    h_layout->setContentsMargins(0, 0, 0, 0);
+    h_layout->setContentsMargins(QMargins(0, 0, 0, 0));
     h_layout->setStretch(0, 1);
     h_layout->setStretch(1, 3);
     this->setLayout(h_layout);
@@ -80,7 +82,7 @@ T_live2d::T_live2d(QWidget *parent)
     this->move(model->x, model->y);
     if(this->x()*dpiScale+this->width()>cxScreen || this->y()*dpiScale+this->height()>cyScreen){
         APP_LOG_DEBUG("重新定位");
-        this->move(cxScreen/dpiScale - this->width(), cyScreen/dpiScale - this->height());
+        this->move(cxScreen/dpiScale - this->width(), cyScreen/dpiScale - this->height()-40);
     }
 
 
@@ -196,7 +198,7 @@ void T_live2d::add_bubble_input_chat(QString text)
     // APP_LOG_DEBUG("chat area " << this->trans_chat_area->width());
     // chatBubble->setMaxWidth(static_cast<int>(this->trans_chat_area->width() * 0.7));
     chatBubble->setTextPixelSize(15);
-    chatBubble->setMaxWidth(50);
+    chatBubble->setMaxWidth(static_cast<int>(trans_chat_area->width()*2/3) );
 
     chatBubble->setText(text);
 

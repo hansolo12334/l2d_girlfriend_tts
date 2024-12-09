@@ -5,7 +5,9 @@
 
 #include <QScrollBar>
 #include<QCoreApplication>
+#include<QApplication>
 
+#include "resource_loader.h"
 
 
 T_TransparentChatScrollArea::T_TransparentChatScrollArea(QWidget *parent)
@@ -21,37 +23,42 @@ T_TransparentChatScrollArea::T_TransparentChatScrollArea(QWidget *parent)
     scrollArea->horizontalScrollBar()->setValue(1900);
 
 
-    scrollAreaWidgetLayout->setContentsMargins(0, 0, 0, 0);
+    scrollAreaWidgetLayout->setContentsMargins(QMargins(0, 0, 0, 0));
+    scrollAreaWidgetLayout->setSpacing(0);
 
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     scrollArea->setWidgetResizable(true);
 
+    scrollAreaWidget->setContentsMargins(0, 0, 0, 0);
     scrollAreaWidget->setLayout(scrollAreaWidgetLayout);
     scrollArea->setWidget(scrollAreaWidget);
 
-    scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    scrollAreaWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+
+    scrollArea->setContentsMargins(0, 0, 0, 0);
+    scrollArea->setLineWidth(0);
+    scrollArea->setFrameShape(QFrame::NoFrame); //关键！！！ 加上就没间隙了
 
     mainLayout->addWidget(scrollArea);
 
     this->setLayout(mainLayout);
-    // mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
 
-
-
+    this->setContentsMargins(0, 0, 0, 0);
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    // scrollArea->setStyleSheet("background-color:red;");
+    // scrollArea->setStyleSheet("background-color:transparent;");
+    // scrollAreaWidget->setStyleSheet("background-color:transparent;");
 
-    // this->setStyleSheet("background-color:green;");
+    this->setStyleSheet("background-color:green;");
 
 
     vScrollBar = scrollArea->verticalScrollBar();
     hcrollBar=scrollArea->horizontalScrollBar();
-    // scrollArea->setVerticalScrollBar(vScrollBar);
-    // scrollArea->setHorizontalScrollBar(hcrollBar);
+
 
 
     connect(vScrollBar, &QScrollBar::rangeChanged, this, [=](int minValue, int maxValue) {
@@ -60,7 +67,7 @@ T_TransparentChatScrollArea::T_TransparentChatScrollArea(QWidget *parent)
     connect(hcrollBar, &QScrollBar::rangeChanged, this, [=](int minValue, int maxValue) {
         hcrollBar->setValue(maxValue);
     });
-    // setWindowTransparent();
+
 }
 
 
@@ -70,17 +77,23 @@ T_TransparentChatScrollArea::~T_TransparentChatScrollArea()
 }
 
 
-// void T_TransparentChatScrollArea::mousePressEvent(QMouseEvent *event)
-// {
-//     // 让鼠标事件穿透窗体
-//     QWidget::mousePressEvent(event);
-// }
+void T_TransparentChatScrollArea::mousePressEvent(QMouseEvent *event)
+{
+    if(resource_loader::get_instance().moveable())
+    {
+        QWidget::mousePressEvent(event);
+    }
 
-// void T_TransparentChatScrollArea::mouseReleaseEvent(QMouseEvent *event)
-// {
-//     // 让鼠标事件穿透窗体
-//     QWidget::mouseReleaseEvent(event);
-// }
+}
+
+void T_TransparentChatScrollArea::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(resource_loader::get_instance().moveable())
+    {
+        QWidget::mouseReleaseEvent(event);
+    }
+
+}
 
 
 void T_TransparentChatScrollArea::setWindowTransparent()
