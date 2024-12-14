@@ -21,11 +21,14 @@ T_live2d::T_live2d(QWidget *parent)
     bb.fEnable = TRUE;
     DwmEnableBlurBehindWindow((HWND)viewId, &bb);
 
-    this->setAttribute(Qt::WA_TranslucentBackground);
+    // this->setAttribute(Qt::WA_TranslucentBackground);
     this->setWindowFlag(Qt::FramelessWindowHint);
 
     this->setWindowFlag(Qt::WindowType::MSWindowsOwnDC,false);
     this->setWindowFlag(Qt::Tool);
+
+    this->setStyleSheet("background-color:yellow;");
+
 
     if(resource_loader::get_instance().is_top())
     {
@@ -40,13 +43,17 @@ T_live2d::T_live2d(QWidget *parent)
     trans_chat_area = new T_TransparentChatScrollArea();
 
     gl_live2dWidget->setContentsMargins(0, 0, 0, 0);
+
     gl_live2dWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     trans_chat_area->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     // trans_chat_area->setStyleSheet("background-color:transparent;");
 
     open_dialogBt = new HoverButton();
     open_dialogBt->setFixedHeight(30);
     open_dialogBt->setOnHoverText("开启对话框");
+    open_dialogBt->setContentsMargins(0, 0, 0, 0);
+
     connect(open_dialogBt, &QPushButton::clicked, this, &T_live2d::on_open_dialogBt_clicked);
 
     // v_layout->setSpacing(0);
@@ -90,7 +97,7 @@ T_live2d::T_live2d(QWidget *parent)
     dialog_inpit->moveToButtom();
 
     connect(dialog_inpit, &dialogInputEdit::input_content, this,&T_live2d::add_bubble_input_chat);
-
+    connect(dialog_inpit, &dialogInputEdit::responce_content, this, &T_live2d::add_bubble_resopence_chat);
 }
 
 
@@ -202,9 +209,27 @@ void T_live2d::add_bubble_input_chat(QString text)
 
     chatBubble->setText(text);
 
+    textLayout->setAlignment(Qt::AlignRight);
+    textLayout->addStretch();
+    textLayout->addWidget(chatBubble);
 
+    this->trans_chat_area->add_bubble_chat(textLayout);
+}
 
+void T_live2d::add_bubble_resopence_chat(QString text)
+{
 
+    QHBoxLayout *textLayout = new QHBoxLayout();
+    textLayout->addStretch();
+    textLayout->setAlignment(Qt::AlignRight);
+
+    T_AnimationBubble *chatBubble = new T_AnimationBubble(this,T_AnimationBubble::AM_Mod::AM_FADIN);
+    // APP_LOG_DEBUG("chat area " << this->trans_chat_area->width());
+    // chatBubble->setMaxWidth(static_cast<int>(this->trans_chat_area->width() * 0.7));
+    chatBubble->setTextPixelSize(10);
+    chatBubble->setMaxWidth(static_cast<int>(trans_chat_area->width()*2/3) );
+
+    chatBubble->setText(text);
 
     textLayout->setAlignment(Qt::AlignRight);
     textLayout->addStretch();

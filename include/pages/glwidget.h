@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QMouseEvent>
 #include <QCloseEvent>
+#include <QKeyEvent>
 #include<QEnterEvent>
 #include<QWheelEvent>
 
@@ -19,10 +20,13 @@ public:
     ~GLWidget();
 private:
     QPoint mouse_global_pos{0,0};
+
+    QPointF _mouse_pos;
+
     bool outSideL2d = true;
     double scaleFactor = 1.0;
-
-    int l2d_height=0;
+    bool control_key_pressed = false;
+    int l2d_height = 0;
     int l2d_width=0;
 
 protected:
@@ -38,6 +42,9 @@ protected:
     void leaveEvent(QEvent *event) override;
 
     void wheelEvent(QWheelEvent *event) override;
+
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 };
 
 #endif

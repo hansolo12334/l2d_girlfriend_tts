@@ -6,10 +6,13 @@
 #include "event_handler.hpp"
 #include "resource_loader.h"
 
+#include <QtCore5Compat/QTextCodec>
 
 int main(int argc,char **argv)
 {
-    if(event_handler::get_instance().initialize() == false)
+
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+    if (event_handler::get_instance().initialize() == false)
     {
         return 0;
     }

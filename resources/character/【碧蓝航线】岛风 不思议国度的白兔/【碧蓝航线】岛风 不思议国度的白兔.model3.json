@@ -1,0 +1,1063 @@
+{
+  "Version": 3,
+  "Type": 0,
+  "FileReferences": {
+    "Moc": "FileReferences_Moc_0.moc3",
+    "Textures": [
+      "FileReferences_Textures_0_0.png",
+      "FileReferences_Textures_1_0.png",
+      "FileReferences_Textures_2_0.png"
+    ],
+    "Physics": "FileReferences_Physics_0.json",
+    "PhysicsV2": {
+      "File": "FileReferences_Physics_0.json"
+    },
+    "Pose": "FileReferences_Pose_0.json",
+    "Motions": {
+      "选项": [
+        {
+          "Name": "menu",
+          "Text": "菜单",
+          "Choices": [
+            {
+              "Text": "属性展示",
+              "NextMtn": "属性展示:attribute"
+            },
+            {
+              "Text": "语音鉴赏",
+              "NextMtn": "语音鉴赏:lines"
+            },
+            {
+              "Text": "更换贴图",
+              "NextMtn": "贴图更换:贴图更换"
+            },
+            {
+              "Text": "开关闲置语音",
+              "NextMtn": "闲置开关"
+            },
+            {
+              "Text": "开关鼠标追踪",
+              "NextMtn": "鼠标追踪"
+            }
+          ],
+          "TextDuration": 5000,
+          "Priority": 9
+        }
+      ],
+      "属性展示": [
+        {
+          "Name": "attribute",
+          "Text": "当前日期：{$datenow}{$br}当前时间：{$timenow}{$br}当前好感度：{$intimacy}",
+          "Priority": 2,
+          "Ignorable": true,
+          "Interruptable": true
+        }
+      ],
+      "贴图更换": [
+        {
+          "Name": "贴图更换",
+          "Text": "贴图更换",
+          "Choices": [
+            {
+              "Text": "贴图（原版）",
+              "NextMtn": "贴图更换:贴图1"
+            },
+            {
+              "Text": "贴图（阴影）",
+              "NextMtn": "贴图更换:贴图2"
+            },
+            {
+              "Text": "贴图（透明）",
+              "NextMtn": "贴图更换:贴图3"
+            }
+          ]
+        },
+        {
+          "Name": "贴图1",
+          "Command": "replace_tex 0 FileReferences_Textures_0_0.png",
+          "Priority": 2
+        },
+        {
+          "Name": "贴图2",
+          "Command": "replace_tex 0 FileReferences_Textures_1_0.png",
+          "Priority": 2
+        },
+        {
+          "Name": "贴图3",
+          "Command": "replace_tex 0 FileReferences_Textures_2_0.png",
+          "Priority": 2
+        }
+      ],
+      "语音鉴赏": [
+        {
+          "Name": "lines",
+          "Text": "语音鉴赏",
+          "Choices": [
+            {
+              "Text": "主界面",
+              "NextMtn": "lines:lines_tick"
+            },
+            {
+              "Text": "触摸台词",
+              "NextMtn": "lines:lines_touch"
+            },
+            {
+              "Text": "好感度",
+              "NextMtn": "lines:lines_love"
+            },
+            {
+              "Text": "登录台词",
+              "NextMtn": "lines:lines_start"
+            },
+            {
+              "Text": "任务提醒",
+              "NextMtn": "lines:lines_task"
+            }
+          ],
+          "TextDuration": 5000
+        }
+      ],
+      "lines": [
+        {
+          "Name": "lines_tick",
+          "Text": "闲置语音",
+          "Choices": [
+            {
+              "Text": "闲置语音1",
+              "NextMtn": "Leave20_60_240:1"
+            },
+            {
+              "Text": "闲置语音2",
+              "NextMtn": "Leave20_60_240:2"
+            },
+            {
+              "Text": "闲置语音3",
+              "NextMtn": "Leave20_60_240:3"
+            },
+            {
+              "Text": "闲置语音4",
+              "NextMtn": "Leave20_60_240:4"
+            }
+          ],
+          "TextDuration": 5000
+        },
+        {
+          "Name": "lines_touch",
+          "Text": "触摸语音",
+          "Choices": [
+            {
+              "Text": "摸头",
+              "NextMtn": "触摸:摸头"
+            },
+            {
+              "Text": "触摸",
+              "NextMtn": "触摸:触摸"
+            },
+            {
+              "Text": "触摸1",
+              "NextMtn": "触摸:触摸1"
+            },
+            {
+              "Text": "特触",
+              "NextMtn": "触摸:特触"
+            }
+          ],
+          "TextDuration": 5000
+        },
+        {
+          "Name": "lines_love",
+          "Text": "好感度语音{$br}(誓约好感度为120)",
+          "Choices": [
+            {
+              "Text": "失望 (<29)",
+              "NextMtn": "好感:失望"
+            },
+            {
+              "Text": "陌生 (50<<60)",
+              "NextMtn": "好感:陌生"
+            },
+            {
+              "Text": "友好 (61<<79)",
+              "NextMtn": "好感:友好"
+            },
+            {
+              "Text": "喜欢 (80<<99)",
+              "NextMtn": "好感:喜欢"
+            },
+            {
+              "Text": "爱1 (100<<119)",
+              "NextMtn": "好感:爱"
+            },
+            {
+              "Text": "誓约  (=120)",
+              "NextMtn": "好感:誓约"
+            },
+            {
+              "Text": "爱2（）",
+              "NextMtn": "好感:爱1"
+            }
+          ],
+          "TextDuration": 5000
+        },
+        {
+          "Name": "lines_start",
+          "Text": "启动动画",
+          "Choices": [
+            {
+              "Text": "登录台词",
+              "NextMtn": "Start:home1"
+            },
+            {
+              "Text": "回港台词",
+              "NextMtn": "Start:home2"
+            }
+          ],
+          "TextDuration": 5000
+        },
+        {
+          "Name": "lines_task",
+          "Text": "任务奖励",
+          "Choices": [
+            {
+              "Text": "任务提醒",
+              "NextMtn": "任务:任务提醒"
+            },
+            {
+              "Text": "任务完成",
+              "NextMtn": "任务:任务完成"
+            },
+            {
+              "Text": "任务完成1",
+              "NextMtn": "任务:任务完成1"
+            },
+            {
+              "Text": "邮件提醒",
+              "NextMtn": "任务:邮件提醒"
+            },
+            {
+              "Text": "委托完成",
+              "NextMtn": "任务:委托完成"
+            },
+            {
+              "Text": "委托完成1",
+              "NextMtn": "任务:委托完成1"
+            },
+            {
+              "Text": "委托完成2",
+              "NextMtn": "任务:委托完成2"
+            }
+          ],
+          "TextDuration": 5000
+        }
+      ],
+      "鼠标追踪": [
+        {
+          "Name": "0",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_鼠标追踪_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_鼠标追踪_0.wav",
+          "Text": "鼠标追踪已关闭",
+          "Command": "mouse_tracking disable",
+          "VarFloats": [
+            {
+              "Name": "鼠标追踪",
+              "Type": 1,
+              "Code": "equal 1"
+            },
+            {
+              "Name": "鼠标追踪",
+              "Type": 2,
+              "Code": "assign 0"
+            }
+          ]
+        },
+        {
+          "Name": "1",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_鼠标追踪_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_鼠标追踪_0.wav",
+          "Text": "鼠标追踪已开启",
+          "Command": "mouse_tracking enable",
+          "VarFloats": [
+            {
+              "Name": "鼠标追踪",
+              "Type": 1,
+              "Code": "equal 0"
+            },
+            {
+              "Name": "鼠标追踪",
+              "Type": 2,
+              "Code": "assign 1"
+            }
+          ]
+        }
+      ],
+      "闲置开关": [
+        {
+          "Name": "闲置关",
+          "Text": "闲置语音已关闭",
+          "PostCommand": "stop_mtn Leave20_60_240",
+          "VarFloats": [
+            {
+              "Name": "tick",
+              "Type": 1,
+              "Code": "equal 1"
+            },
+            {
+              "Name": "tick",
+              "Type": 2,
+              "Code": "assign 0"
+            }
+          ]
+        },
+        {
+          "Name": "闲置开",
+          "Text": "闲置语音已开启",
+          "PostCommand": "start_mtn Leave20_60_240",
+          "VarFloats": [
+            {
+              "Name": "tick",
+              "Type": 1,
+              "Code": "equal 0"
+            },
+            {
+              "Name": "tick",
+              "Type": 2,
+              "Code": "assign 1"
+            }
+          ]
+        }
+      ],
+      "Leave20_60_240": [
+        {
+          "Name": "1",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_0.wav",
+          "Text": "哦哦！在那样的地方竟然有蛋糕！诶嘿嘿……哎呀不行指挥官！已经说了现在重要的是从这里出去—！",
+          "Priority": 3,
+          "Interruptable": true,
+          "Intimacy": {
+            "Bonus": 1
+          },
+          "NextMtn": "好感度:誓约",
+          "Weight": 2,
+          "VarFloats": [
+            {
+              "Name": "tick",
+              "Type": 1,
+              "Code": "equal 1"
+            }
+          ],
+          "OverrideFaceParams": true
+        },
+        {
+          "Name": "2",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_1.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_1.wav",
+          "Text": "要是骏河在这里……奇怪？如果是骏河会怎么出去呢？岛风，完全想不到呢！",
+          "Priority": 3,
+          "Interruptable": true,
+          "Intimacy": {
+            "Bonus": 1
+          },
+          "NextMtn": "好感度:誓约",
+          "VarFloats": [
+            {
+              "Name": "tick",
+              "Type": 1,
+              "Code": "equal 1"
+            }
+          ],
+          "OverrideFaceParams": true
+        },
+        {
+          "Name": "3",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_2.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_2.wav",
+          "Text": "出口在那边是吧！好的岛风会尽全力……啊好疼！这，这不是镜子么！",
+          "Priority": 3,
+          "Interruptable": true,
+          "Intimacy": {
+            "Bonus": 1
+          },
+          "NextMtn": "好感度:誓约",
+          "Weight": 3,
+          "VarFloats": [
+            {
+              "Name": "tick",
+              "Type": 1,
+              "Code": "equal 1"
+            }
+          ],
+          "OverrideFaceParams": true
+        },
+        {
+          "Name": "4",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_1.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_3.wav",
+          "Text": "亲爱的早上好~首先是一个啾…嘿嘿~应该叫你指挥官才对，现在还是工作时间啦~",
+          "Intimacy": {
+            "Min": 120,
+            "Bonus": 1
+          },
+          "NextMtn": "好感度:誓约",
+          "Speed": 0.9
+        }
+      ],
+      "触摸": [
+        {
+          "Name": "摸头",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_触摸_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_触摸_0.wav",
+          "Text": "呀啊啊啊，耳、耳朵不能随便碰……！身，身体没力气了……",
+          "Intimacy": {
+            "Bonus": 1
+          },
+          "NextMtn": "好感度:誓约"
+        },
+        {
+          "Name": "触摸",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_鼠标追踪_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_鼠标追踪_0.wav",
+          "Text": "嗯嗯，岛风会带你走向正确的方向哦——",
+          "Intimacy": {
+            "Bonus": 1
+          },
+          "NextMtn": "好感度:誓约"
+        },
+        {
+          "Name": "触摸1",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_鼠标追踪_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_触摸_2.wav",
+          "Text": "指挥官，需要岛风帮你做什么吗？",
+          "Intimacy": {
+            "Min": 100,
+            "Bonus": 1
+          },
+          "NextMtn": "好感度:誓约"
+        },
+        {
+          "Name": "特触",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_触摸_3.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_触摸_3.wav",
+          "Text": "只要不是耳朵……就算不是耳朵也很害羞啦！真是的！"
+        },
+        {
+          "Name": "镜子",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_触摸_4.motion3.json"
+        }
+      ],
+      "Start": [
+        {
+          "Name": "home1",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Start_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_Start_0.wav",
+          "Text": "啊，指挥官！诶嘿嘿，这是岛风刚才发现的很好喝的茶哦！一起稍作休息吧！",
+          "Command": "mouse_tracking disable;start_mtn Leave20_60_240",
+          "Priority": 8,
+          "Interruptable": true,
+          "Intimacy": {
+            "Bonus": 2
+          },
+          "Weight": 2,
+          "VarFloats": [
+            {
+              "Name": "music swtich",
+              "Type": 2,
+              "Code": "assign 0"
+            },
+            {
+              "Name": "鼠标追踪",
+              "Type": 2,
+              "Code": "assign 0"
+            },
+            {
+              "Name": "tick",
+              "Type": 2,
+              "Code": "init 1"
+            }
+          ]
+        },
+        {
+          "Name": "home2",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Start_1.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_Start_1.wav",
+          "Text": "仔细想想，岛风不是爱丽丝而是怀表兔呢！会迷路误入这里不是很奇怪吗？？",
+          "Command": "mouse_tracking disable;start_mtn Leave20_60_240",
+          "Priority": 8,
+          "Interruptable": true,
+          "Intimacy": {
+            "Bonus": 2
+          },
+          "VarFloats": [
+            {
+              "Name": "music swtich",
+              "Type": 2,
+              "Code": "assign 0"
+            },
+            {
+              "Name": "鼠标追踪",
+              "Type": 2,
+              "Code": "assign 0"
+            },
+            {
+              "Name": "tick",
+              "Type": 2,
+              "Code": "init 1"
+            }
+          ]
+        }
+      ],
+      "好感度": [
+        {
+          "Name": "失望",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_好感度_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_0.wav",
+          "SoundDelay": 100,
+          "Text": "只要你能够改正错误的话，我还是能原谅你的！",
+          "Priority": 7,
+          "Intimacy": {
+            "Min": 0,
+            "Max": 49
+          },
+          "Speed": 0.8
+        },
+        {
+          "Name": "陌生",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_鼠标追踪_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_1.wav",
+          "Text": "我一直坚信，岛风是最强的驱逐舰！为了能够达到最强，无论训练还是出击我都会全力以赴的！",
+          "Priority": 7,
+          "Intimacy": {
+            "Min": 50,
+            "Max": 60
+          }
+        },
+        {
+          "Name": "友好",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_2.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_2.wav",
+          "Text": "虽然经常被说太鲁莽…不过，有冲劲不也是一件好事吗？如果在战斗中没有全力以赴的话，反而很容易留下遗憾不是吗？嘿嘿~",
+          "Priority": 7,
+          "Intimacy": {
+            "Min": 61,
+            "Max": 79
+          }
+        },
+        {
+          "Name": "喜欢",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_1.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_3.wav",
+          "Text": "指挥官是为了什么而一直奋战到现在的呢？只是有点好奇啦…不过，无论遇到什么麻烦，岛风都会尽力帮忙的！…这次不会冲过头的啦！",
+          "Priority": 7,
+          "Intimacy": {
+            "Min": 80,
+            "Max": 99
+          },
+          "Speed": 0.8
+        },
+        {
+          "Name": "爱",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Start_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_4.wav",
+          "Text": "今天工作结束以后，一起去哪里转转吧？……因、因为工作的时候没法和指挥官独处…啊啊，真是的！我就是想和指挥官单独待一会嘛！可以…吗？",
+          "Priority": 7,
+          "Intimacy": {
+            "Min": 100,
+            "Max": 119
+          },
+          "Speed": 0.8
+        },
+        {
+          "Name": "誓约",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_好感度_5.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_5.wav",
+          "SoundDelay": 500,
+          "Text": "—啊啊啊，不是说有紧急任务要集合吗！？—欸，这个戒指是……被骗了！指挥官没必要骗我嘛…直接说出来我也不会拒绝啦！",
+          "FadeIn": 1000,
+          "Command": "start_mtn 好感度#1:wedding",
+          "Priority": 7,
+          "Intimacy": {
+            "Equal": 120,
+            "Bonus": 1
+          }
+        },
+        {
+          "Name": "爱1",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_1.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_6.wav",
+          "Text": "工作结束后，和亲爱的一起吃饭、逛街…这样二人独处的时间，怎么样都不嫌多呢。诶嘿嘿~以后也请多多关照啦♪",
+          "Intimacy": {
+            "Min": 121
+          },
+          "Speed": 0.9
+        }
+      ],
+      "好感": [
+        {
+          "Name": "失望",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_好感度_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_0.wav",
+          "SoundDelay": 100,
+          "Text": "只要你能够改正错误的话，我还是能原谅你的！",
+          "Priority": 7,
+          "Interruptable": true,
+          "Speed": 0.8
+        },
+        {
+          "Name": "陌生",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_鼠标追踪_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_1.wav",
+          "Text": "我一直坚信，岛风是最强的驱逐舰！为了能够达到最强，无论训练还是出击我都会全力以赴的！",
+          "Priority": 7,
+          "Interruptable": true
+        },
+        {
+          "Name": "友好",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_2.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_2.wav",
+          "Text": "虽然经常被说太鲁莽…不过，有冲劲不也是一件好事吗？如果在战斗中没有全力以赴的话，反而很容易留下遗憾不是吗？嘿嘿~",
+          "Priority": 7,
+          "Interruptable": true
+        },
+        {
+          "Name": "喜欢",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_1.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_3.wav",
+          "Text": "指挥官是为了什么而一直奋战到现在的呢？只是有点好奇啦…不过，无论遇到什么麻烦，岛风都会尽力帮忙的！…这次不会冲过头的啦！",
+          "Priority": 7,
+          "Interruptable": true,
+          "Speed": 0.8
+        },
+        {
+          "Name": "爱",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Start_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_4.wav",
+          "Text": "今天工作结束以后，一起去哪里转转吧？……因、因为工作的时候没法和指挥官独处…啊啊，真是的！我就是想和指挥官单独待一会嘛！可以…吗？",
+          "Priority": 7,
+          "Interruptable": true,
+          "Speed": 0.8
+        },
+        {
+          "Name": "誓约",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_好感度_5.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_5.wav",
+          "SoundDelay": 500,
+          "Text": "—啊啊啊，不是说有紧急任务要集合吗！？—欸，这个戒指是……被骗了！指挥官没必要骗我嘛…直接说出来我也不会拒绝啦！",
+          "FadeIn": 1000,
+          "Command": "start_mtn 好感度#1:wedding",
+          "Priority": 7,
+          "Interruptable": true
+        },
+        {
+          "Name": "爱1",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Leave20_60_240_1.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_好感度_6.wav",
+          "Text": "工作结束后，和亲爱的一起吃饭、逛街…这样二人独处的时间，怎么样都不嫌多呢。诶嘿嘿~以后也请多多关照啦♪",
+          "Priority": 7,
+          "Interruptable": true,
+          "Speed": 0.9
+        }
+      ],
+      "任务": [
+        {
+          "Name": "任务提醒",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_任务_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_任务_0.wav",
+          "Text": "换做拉菲的话，应付场合应该没问题吧……啊！来新任务了！",
+          "Priority": 4,
+          "Speed": 0.9
+        },
+        {
+          "Name": "任务完成",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_任务_1.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_任务_1.wav",
+          "Text": "任务完成啦！快快快！快看看奖励有什么！",
+          "Priority": 5
+        },
+        {
+          "Name": "任务完成1",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_任务_1.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_任务_2.wav",
+          "Text": "任务完成！岛风提前把奖励拿来啦！"
+        },
+        {
+          "Name": "邮件提醒",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_任务_3.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_任务_3.wav",
+          "Text": "指挥官，最好确认一下新的邮件哦~",
+          "Priority": 5
+        },
+        {
+          "Name": "委托完成",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_任务_4.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_任务_4.wav",
+          "Text": "委托组回来了！不能再这样下去了！"
+        },
+        {
+          "Name": "委托完成1",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_任务_4.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_任务_5.wav",
+          "Text": "唔唔，委托的路上不会遭到袭击什么的吧？"
+        },
+        {
+          "Name": "委托完成2",
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_任务_1.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_任务_6.wav",
+          "Text": "岛风看到委托组平安回来啦！和平无事是最好的！"
+        }
+      ],
+      "Idle#1": [
+        {
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_Idle#1_0.motion3.json",
+          "FileLoop": true
+        }
+      ],
+      "Idle": [
+        {
+          "File": "motions/FileReferences_Pose_0.motion3.json",
+          "FileLoop": true,
+          "Ignorable": true
+        }
+      ],
+      "touch_head": [
+        {
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_触摸_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_触摸_0.wav",
+          "Text": "呀啊啊啊，耳、耳朵不能随便碰……！身，身体没力气了……"
+        }
+      ],
+      "touch_special": [
+        {
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_触摸_3.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_触摸_3.wav",
+          "Text": "只要不是耳朵……就算不是耳朵也很害羞啦！真是的！"
+        }
+      ],
+      "touch_body": [
+        {
+          "File": "motions/【碧蓝航线】岛风 不思议国度的白兔_鼠标追踪_0.motion3.json",
+          "Sound": "sounds/【碧蓝航线】岛风 不思议国度的白兔_触摸_2.wav",
+          "Text": "指挥官，需要岛风帮你做什么吗？"
+        }
+      ]
+    }
+  },
+  "Controllers": {
+    "ParamHit": {
+      "Items": [
+        {
+          "Name": "右丝袜",
+          "Id": "touch_drag4",
+          "HitArea": "TouchDrag4",
+          "Axis": 1,
+          "Factor": 0.005,
+          "ReleaseType": 0,
+          "LockParam": true,
+          "LowPriority": true
+        },
+        {
+          "Name": "左丝袜",
+          "Id": "touch_drag3",
+          "HitArea": "TouchDrag3",
+          "Axis": 1,
+          "Factor": 0.005,
+          "ReleaseType": 0,
+          "LockParam": true,
+          "LowPriority": true
+        },
+        {
+          "Name": "裙子",
+          "Id": "touch_drag1",
+          "HitArea": "TouchDrag1",
+          "Axis": 1,
+          "Factor": -0.005,
+          "Release": 2000,
+          "ReleaseType": 3,
+          "LowPriority": true,
+          "MaxMtn": "触摸:特触"
+        },
+        {
+          "Name": "镜子",
+          "Id": "touch_drag2",
+          "HitArea": "TouchDrag2",
+          "Axis": 1,
+          "Factor": -0.02,
+          "Release": 500,
+          "ReleaseType": 0,
+          "MaxMtn": "触摸:镜子"
+        }
+      ],
+      "Enabled": true
+    },
+    "ParamLoop": {},
+    "KeyTrigger": {},
+    "ParamTrigger": {},
+    "AreaTrigger": {},
+    "HandTrigger": {},
+    "EyeBlink": {
+      "MinInterval": 500,
+      "MaxInterval": 6000,
+      "Items": [
+        {
+          "Id": "ParamEyeLOpen",
+          "Min": 0.0,
+          "Max": 1.0,
+          "BlendMode": 2,
+          "Input": 0
+        },
+        {
+          "Id": "ParamEyeROpen",
+          "Min": 0.0,
+          "Max": 1.0,
+          "BlendMode": 2,
+          "Input": 0
+        }
+      ],
+      "Enabled": true
+    },
+    "LipSync": {
+      "Gain": 5.0,
+      "SmoothTime": 0.0102406479,
+      "Items": [
+        {
+          "Id": "ParamMouthOpenY",
+          "Min": 0.0,
+          "Max": 1.0,
+          "BlendMode": 1,
+          "Input": 0
+        }
+      ],
+      "Enabled": true
+    },
+    "MouseTracking": {
+      "SmoothTime": 0.15,
+      "Items": [
+        {
+          "Id": "ParamEyeBallX",
+          "Min": -1.0,
+          "Max": 1.0,
+          "DefaultValue": 0.0,
+          "Input": 1
+        },
+        {
+          "Id": "ParamEyeBallY",
+          "Min": -1.0,
+          "Max": 1.0,
+          "DefaultValue": 0.0,
+          "Axis": 1,
+          "Input": 2
+        },
+        {
+          "Id": "ParamAngleX",
+          "Min": -30.0,
+          "Max": 30.0,
+          "DefaultValue": 0.0,
+          "Weight": 0.299341023,
+          "BlendMode": 1,
+          "Input": 1
+        },
+        {
+          "Id": "ParamAngleY",
+          "Min": -30.0,
+          "Max": 30.0,
+          "DefaultValue": 0.0,
+          "Weight": 0.299340963,
+          "BlendMode": 1,
+          "Axis": 1,
+          "Input": 2
+        },
+        {
+          "Id": "ParamAngleZ",
+          "Min": -30.0,
+          "Max": 30.0,
+          "DefaultValue": 0.0,
+          "BlendMode": 1,
+          "Axis": 2,
+          "Input": 0
+        },
+        {
+          "Id": "ParamBodyAngleX",
+          "Min": -5.0,
+          "Max": 5.0,
+          "DefaultValue": 0.0,
+          "BlendMode": 1,
+          "Input": 1
+        },
+        {
+          "Id": "ParamBodyAngleY",
+          "Min": -5.0,
+          "Max": 5.0,
+          "DefaultValue": 0.0,
+          "BlendMode": 1,
+          "Axis": 1,
+          "Input": 2
+        },
+        {
+          "Id": "ParamBodyAngleZ",
+          "Min": -3.0,
+          "Max": 3.0,
+          "DefaultValue": 0.0,
+          "Weight": 0.201352641,
+          "BlendMode": 1,
+          "Axis": 2,
+          "Input": 1
+        },
+        {
+          "Id": "Param289",
+          "Min": -30.0,
+          "Max": 30.0,
+          "DefaultValue": 0.0,
+          "Weight": 0.299340963,
+          "BlendMode": 1,
+          "Input": 2
+        },
+        {
+          "Id": "Param20",
+          "Min": -5.0,
+          "Max": 5.0,
+          "DefaultValue": 0.0,
+          "Weight": 0.101630256,
+          "BlendMode": 1,
+          "Axis": 1,
+          "Input": 2
+        },
+        {
+          "Id": "Param305",
+          "Min": -5.0,
+          "Max": 5.0,
+          "DefaultValue": 0.0,
+          "Weight": 0.101630256,
+          "BlendMode": 1,
+          "Axis": 1,
+          "Input": 2
+        }
+      ],
+      "Enabled": true
+    },
+    "AutoBreath": {
+      "Enabled": true
+    },
+    "ExtraMotion": {
+      "Enabled": true
+    },
+    "Accelerometer": {
+      "Enabled": true
+    },
+    "Microphone": {},
+    "Transform": {},
+    "FaceTracking": {
+      "Enabled": true
+    },
+    "HandTracking": {},
+    "ParamValue": {},
+    "PartOpacity": {},
+    "ArtmeshOpacity": {
+      "Items": [
+        {
+          "Name": "外裙",
+          "Ids": [
+            "qun1",
+            "qun1_1",
+            "qun1_2",
+            "qun1_3",
+            "qunA",
+            "huaduo1",
+            "huaduo2",
+            "huaduo3",
+            "huaduo4",
+            "huaduo5"
+          ],
+          "Value": 1.0
+        },
+        {
+          "Name": "内裙",
+          "Ids": [
+            "qun2",
+            "qunA1"
+          ],
+          "Value": 1.0
+        },
+        {
+          "Name": "腿部阴影",
+          "Ids": [
+            "datuiYY"
+          ],
+          "Value": 1.0
+        },
+        {
+          "Name": "内裤",
+          "Ids": [
+            "pangci",
+            "pangciYY"
+          ],
+          "Value": 1.0
+        }
+      ],
+      "Enabled": true
+    },
+    "ArtmeshColor": {},
+    "ArtmeshCulling": {
+      "DefaultMode": 0
+    },
+    "IntimacySystem": {
+      "InitValue": 50,
+      "MaxValue": 200,
+      "Enabled": true
+    }
+  },
+  "HitAreas": [
+    {
+      "Name": "选项",
+      "Id": "huangji1",
+      "Motion": "选项:menu"
+    },
+    {
+      "Name": "TouchDrag1",
+      "Id": "TouchDrag1"
+    },
+    {
+      "Name": "TouchDrag2",
+      "Id": "TouchDrag2"
+    },
+    {
+      "Name": "TouchDrag3",
+      "Id": "TouchDrag3"
+    },
+    {
+      "Name": "TouchDrag4",
+      "Id": "TouchDrag4"
+    },
+    {
+      "Name": "TouchHead",
+      "Id": "TouchHead",
+      "Motion": "touch_head"
+    },
+    {
+      "Name": "TouchBody",
+      "Id": "TouchBody",
+      "Motion": "touch_body"
+    },
+    {
+      "Name": "TouchSpecial",
+      "Id": "TouchSpecial",
+      "Order": 1,
+      "Motion": "touch_special"
+    },
+    {
+      "Name": "任务",
+      "Id": "zhongbiao",
+      "Motion": "任务"
+    },
+    {
+      "Name": "好感度",
+      "Id": "shouL1",
+      "Motion": "好感度"
+    }
+  ],
+  "Options": {
+    "ScaleFactor": 0.1,
+    "AnisoLevel": 4,
+    "MaskBufferSize": 4096,
+    "TexFixed": true,
+    "TexType": 0
+  }
+}

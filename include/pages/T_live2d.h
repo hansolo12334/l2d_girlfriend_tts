@@ -31,6 +31,8 @@ public:
 
 public:
     Q_SLOT void add_bubble_input_chat(QString text);
+    Q_SLOT void add_bubble_resopence_chat(QString text);
+
 private:
     int pos_x{};
     int pos_y{};

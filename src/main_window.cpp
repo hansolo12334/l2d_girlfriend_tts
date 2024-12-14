@@ -55,7 +55,7 @@ main_window::main_window(QWidget *parent) : ElaWindow(parent)
 
     init_sysTrayMenu();
     _sysTrayIcon->show();
-
+    APP_LOG_DEBUG("系统托盘启动");
 
     _live2dWidget->show();
 }

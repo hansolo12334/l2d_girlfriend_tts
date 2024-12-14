@@ -27,6 +27,9 @@ dialogInputEdit::dialogInputEdit(QWidget *parent)
  , senceVoice_ws(new senceVoiceWebServerApi())
  , _audio_handle(new AudioHandler())
 {
+
+    // setlocale(LC_ALL, "en_US.UTF-8");
+
     auto viewId = this->winId();
     DWM_BLURBEHIND bb = { 0 };
     HRGN hRgn = CreateRectRgn(0, 0, -1, -1); //应用毛玻璃的矩形范围，
@@ -65,14 +68,14 @@ dialogInputEdit::dialogInputEdit(QWidget *parent)
     connect(_voiceInputBt, &ElaIconButton::clicked, this, &dialogInputEdit::connectToSenceVoiceWebserver);
 
 
-    ElaSlider *tokenSize_slider = new ElaSlider(this);
-    tokenSize_slider->setRange(0, 10);
-    connect(tokenSize_slider, &ElaSlider::valueChanged, this, [=]() {
-        //共用的全局设置数据
-        // qDebug() << tokenSize_slider->value();
-        Live2D::Cubism::Framework::csmFloat32 vv = static_cast<Live2D::Cubism::Framework::csmFloat32>(tokenSize_slider->value() * 0.1f);
-        LAppLive2DManager::GetInstance()->user_lipSync(vv);
-    });
+    // ElaSlider *tokenSize_slider = new ElaSlider(this);
+    // tokenSize_slider->setRange(0, 10);
+    // connect(tokenSize_slider, &ElaSlider::valueChanged, this, [=]() {
+    //     //共用的全局设置数据
+    //     // qDebug() << tokenSize_slider->value();
+    //     Live2D::Cubism::Framework::csmFloat32 vv = static_cast<Live2D::Cubism::Framework::csmFloat32>(tokenSize_slider->value() * 0.1f);
+    //     LAppLive2DManager::GetInstance()->user_lipSync(vv);
+    // });
 
     _mainLayout = new QHBoxLayout();
     _mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -80,7 +83,8 @@ dialogInputEdit::dialogInputEdit(QWidget *parent)
     _mainLayout->addWidget(_inputLineEdt);
     _mainLayout->addWidget(_sendChatBt);
     _mainLayout->addWidget(_closeCurrentBt);
-    _mainLayout->addWidget(tokenSize_slider);
+    //测试嘴型
+    // _mainLayout->addWidget(tokenSize_slider);
 
 
     this->setLayout(_mainLayout);
@@ -153,19 +157,24 @@ void dialogInputEdit::inputTextEvent()
     // chatBubble->setWordWrap(false);
 
     // _mainLayout->addWidget(chatBubble);
-
+    APP_LOG_DEBUG("ollama asdasdasdasdasda");
     if (_inputLineEdt->text().isEmpty())
     {
         return;
     }
     emit input_content(_inputLineEdt->text().simplified());
+
     // Ollama::OllamaRequest ollama_request;
+
 
 
     Ollama::OllamaAPI::instance().set_model("qwen2-rp");
     Ollama::OllamaAPI::instance().set_message_assistant(AppConfig::instance().getPromotSentence());
     Ollama::OllamaAPI::instance().set_token_size(AppConfig::instance().getTokenSize());
     Ollama::OllamaAPI::instance().set_stream(true);
+    Ollama::OllamaAPI::instance().set_ollama_url(AppConfig::instance().getOllamaApiAddress());
+
+    APP_LOG_DEBUG("ollama :"<<_inputLineEdt->text().simplified());
     // ollama_request.model = "qwen2-rp";
     // ollama_request.stream = true;
 
@@ -189,10 +198,8 @@ void dialogInputEdit::inputTextEvent()
     bool re = Ollama::OllamaAPI::instance().send_message_to_server(re_message);
 
     if(re){
-        APP_LOG_DEBUG(re_message);
+        emit responce_content(re_message.simplified());
     }
-
-
 
 
     if(!AppConfig::instance().isEnableTTS()){
@@ -235,6 +242,7 @@ void dialogInputEdit::inputTextEvent()
 
         });
     }
+    _inputLineEdt->clear();
 }
 
 

@@ -165,8 +165,8 @@ csmBool CubismModelSettingJson::IsExistLipSyncParameters() const
 {
     if (_jsonValue[FrequentNode_Groups]->IsNull() || _jsonValue[FrequentNode_Groups]->IsError())
     {
-        std::cerr << "jsonValue[FrequentNode_Groups]->IsNull() "<<_jsonValue[FrequentNode_Groups]->IsNull() << std::endl;
-        std::cerr << "_jsonValue[FrequentNode_Groups]->IsError() "<<_jsonValue[FrequentNode_Groups]->IsError() << std::endl;
+        std::cerr << "[Framework]jsonValue[FrequentNode_Groups]->IsNull() "<<_jsonValue[FrequentNode_Groups]->IsNull() << std::endl;
+        std::cerr << "[Framework]_jsonValue[FrequentNode_Groups]->IsError() "<<_jsonValue[FrequentNode_Groups]->IsError() << std::endl;
         return false;
     }
 
@@ -182,6 +182,8 @@ csmBool CubismModelSettingJson::IsExistLipSyncParameters() const
 
 CubismModelSettingJson::CubismModelSettingJson(const csmByte* buffer, csmSizeInt size)
 {
+    //hansolo 中文编码
+    setlocale(LC_ALL, "en_US.UTF-8");
     _json = Utils::CubismJson::Create(buffer, size);
 
     if (_json)
@@ -316,7 +318,10 @@ csmInt32 CubismModelSettingJson::GetMotionCount(const csmChar* groupName)
 
 const csmChar* CubismModelSettingJson::GetMotionFileName(const csmChar* groupName, csmInt32 index)
 {
-    if (!IsExistMotionGroupName(groupName))return "";
+    if (!IsExistMotionGroupName(groupName)){
+        std::cerr << "[Framework]IsExistMotionGroupName " << "动作组不存在!" << std::endl;
+        return "";
+    }
     return (*_jsonValue[FrequentNode_Motions])[groupName][index][FilePath].GetRawString();
 }
 
@@ -416,9 +421,10 @@ CubismIdHandle CubismModelSettingJson::GetEyeBlinkParameterId(csmInt32 index)
 
 csmInt32 CubismModelSettingJson::GetLipSyncParameterCount()
 {
-    std::cerr << "IsExistLipSyncParameters "<<IsExistLipSyncParameters() << std::endl;
+
     if (!IsExistLipSyncParameters())
     {
+        std::cerr << "[Framework]IsExistLipSyncParameters "<<"参数不存在" << std::endl;
         return 0;
     }
 

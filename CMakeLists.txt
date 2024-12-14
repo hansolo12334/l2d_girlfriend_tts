@@ -10,11 +10,18 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
+
+
+
+# add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+
+# add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/execution-charset:utf-8>")
 # add_compile_options(-std=c++17)
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Network Multimedia)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network Multimedia OpenGLWidgets WebSockets Sql)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network Multimedia OpenGLWidgets WebSockets Sql Core5Compat)
 
 # FILE(GLOB ORIGIN *.cpp *.h)
 # FILE(GLOB MODELVIEW ModelView/*.h ModelView/*.cpp)
@@ -25,7 +32,7 @@ FILE(GLOB PAGES_FILE include/pages/*.h src/pages/*.cpp)
 FILE(GLOB SMALL_WIDGETS_FILE include/small_widgets/*.h src/small_widgets/*.cpp)
 FILE(GLOB API_FILE include/api/*.h src/api/*.cpp)
 
-FILE(GLOB LIVE2DAPP_FILE include/pages/Live2dApp/*hpp src/pages/Live2dApp/*cpp)
+FILE(GLOB LIVE2DAPP_FILE include/Live2dApp/*hpp src/Live2dApp/*cpp)
 # FILE(GLOB GL_WIDGET_FILE src/pages/gl_widget/*cpp)
 
 FILE(GLOB TOOLS include/tools/*.h src/tools/*.cpp src/tools/*.c)
@@ -36,7 +43,7 @@ FILE(GLOB TOOLS include/tools/*.h src/tools/*.cpp src/tools/*.c)
 SET(PAGES_SOURCE include/pages/)
 SET(API_SOURCE include/api/)
 SET(SMALLL_WIDGETS_SOURCE include/small_widgets)
-SET(LIVE2DAPP_SOURCE include/pages/Live2dApp/)
+SET(LIVE2DAPP_SOURCE include/Live2dApp/)
 # SET(GL_WIDGET_SOURCE include/pages/gl_widget/)
 SET(TOOLS_SOURCE include/tools/)
 
@@ -91,7 +98,15 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     )
 
     #遍历所有资源文件
-    file(GLOB_RECURSE RES_PATHS *.png *.jpg *.svg *.ico *.ttf *.webp *.js)
+    file(GLOB_RECURSE RES_PATHS
+            resources/image/*.png
+            resources/image/*.jpg
+            resources/image/*.svg
+            resources/image/*.ico
+            resources/image/*.ttf
+            resources/image/*.webp
+            resources/image/*.js
+        )
     foreach(filepath ${RES_PATHS})
             string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
             list(APPEND resource_files ${filename})
@@ -133,7 +148,7 @@ if(ELAWIDGETTOOLS_FOUND)
 endif ()
 set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
 
-SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DAPP_DEBUG")
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DAPP_DEBUG") #开启debug打印输出
 include_directories(include)
 include_directories(${GLEW_PATH}/include)
 include_directories(Framework/src)
@@ -157,6 +172,7 @@ target_link_libraries(ElaWidget_QT PRIVATE
     Qt${QT_VERSION_MAJOR}::Sql
     Qt${QT_VERSION_MAJOR}::OpenGLWidgets
     Qt${QT_VERSION_MAJOR}::WebSockets
+    Qt${QT_VERSION_MAJOR}::Core5Compat
 
     ElaWidgetTools
     glfw
@@ -207,7 +223,7 @@ add_custom_command(
   POST_BUILD
   COMMAND
     ${CMAKE_COMMAND} -E
-      copy_directory ${RES_PATH} $<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources
+    copy_directory ${RES_PATH} $<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources
 )
 
 

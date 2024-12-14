@@ -29,6 +29,11 @@ public:
     QString getPromotSentence() const { return _promot_sentence; }
     void setPromotSentence(QString promot_sentence){ _promot_sentence = promot_sentence; emit configChanged(); }
 
+    QString getOllamaApiAddress() const { return _ollama_api_address; }
+    void setOllamaApiAddress(QString ollama_api_address){ _ollama_api_address = ollama_api_address; emit configChanged(); }
+
+
+
     int getTokenSize() const { return _token_size; }
     void setTokenSize(int token_size){ _token_size = token_size; emit configChanged(); }
 
@@ -63,6 +68,7 @@ private:
     int _vice_choise = 1;
     int _conversationTimes = 0;
     QString _promot_sentence{};
+    QString _ollama_api_address{};
 };
 
 #endif // APPCONFIG_H

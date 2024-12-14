@@ -92,10 +92,34 @@ T_Ollama_Setting::T_Ollama_Setting(QWidget *parent) : T_BasePage(parent)
 
 
 
+
+    ElaLineEdit *api_address_edit = new ElaLineEdit(this);
+    api_address_edit->setText("http://localhost:11434/api/chat");
+    api_address_edit->setMaximumWidth(500);
+    AppConfig::instance().setOllamaApiAddress(api_address_edit->text());
+
+    ElaScrollPageArea *api_address_Area = new ElaScrollPageArea(this);
+    QHBoxLayout *api_address_Layout = new QHBoxLayout(api_address_Area);
+    ElaText *api_address_Text = new ElaText("api地址", this);
+    api_address_Text->setWordWrap(true);
+    api_address_Text->setTextPixelSize(15);
+    api_address_Layout->addWidget(api_address_Text);
+    // promot_sentence_Layout->addStretch();
+    api_address_Layout->addWidget(api_address_edit);
+    connect(api_address_edit, &ElaLineEdit::textChanged, this, [=]() {
+        //共用的全局设置数据
+        AppConfig::instance().setOllamaApiAddress(api_address_edit->text());
+        AppConfig::instance().saveSettings();
+    });
+
+
+
+
     QWidget *centralWidget = new QWidget(this);
     centralWidget->setWindowTitle("Ollama对话模型设置");
     QVBoxLayout *centerLayout = new QVBoxLayout(centralWidget);
     centerLayout->addSpacing(30);
+    centerLayout->addWidget(api_address_Area);
     centerLayout->addWidget(ollama_start_Area);
     centerLayout->addWidget(promot_sentence_Area);
     centerLayout->addWidget(toke_size_Area);

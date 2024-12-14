@@ -177,7 +177,7 @@ add_custom_command(
     COMMENT "Copying ElaWidgetToolsd.dll to output directory"
 )
 
-set(RES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/character)
+set(RES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/resources/image)
 add_custom_command(
   TARGET ${PROJECT_NAME}
   POST_BUILD

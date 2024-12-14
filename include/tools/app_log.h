@@ -17,6 +17,7 @@
 
 
 #include <QDebug>
+#include <clocale>
 
 #ifdef APP_DEBUG
 #define APP_LOG_DEBUG(...) \

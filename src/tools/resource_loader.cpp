@@ -5,7 +5,7 @@
 #include <QFile>
 
 #include "app_log.h"
-#include "cJSON.h"
+
 #include "event_handler.hpp"
 #include "message_queue.hpp"
 #include "resource_loader.h"
@@ -70,7 +70,7 @@ bool resource_loader::initialize()
     }
     else
     {
-        system_tray_icon_path = "Resources/Qf.PNG";
+        system_tray_icon_path = "resources/image/640.PNG";
     }
 
     if (json_root.contains("module") && json_root["module"].isArray())
