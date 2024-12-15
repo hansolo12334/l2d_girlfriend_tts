@@ -8,7 +8,7 @@ namespace Ollama
 
 bool OllamaAPI::send_message_to_server(QString &text)
 {
-    APP_LOG_DEBUG("send_message_to_ollama_server");
+    APP_LOG_DEBUG("send_message_to_ollama_server: "<<ollam_url);
     QJsonObject requestJson = ollama_request.toJson();
     QJsonDocument requestJsonDoc(requestJson);
 

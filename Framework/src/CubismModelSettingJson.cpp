@@ -183,7 +183,7 @@ csmBool CubismModelSettingJson::IsExistLipSyncParameters() const
 CubismModelSettingJson::CubismModelSettingJson(const csmByte* buffer, csmSizeInt size)
 {
     //hansolo 中文编码
-    setlocale(LC_ALL, "en_US.UTF-8");
+    // setlocale(LC_ALL, "en_US.UTF-8");
     _json = Utils::CubismJson::Create(buffer, size);
 
     if (_json)

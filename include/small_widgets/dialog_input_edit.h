@@ -53,11 +53,14 @@ Q_SIGNALS:
     void audio_rms(double rms);
     void input_content(QString text);
     void responce_content(QString text);
+    void hideChatScrollArea();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+
+
 };
 
 #endif

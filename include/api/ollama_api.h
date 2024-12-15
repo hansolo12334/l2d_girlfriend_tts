@@ -132,7 +132,7 @@ private :
     bool isInit = false;
     QNetworkAccessManager *manager = nullptr;
 
-    QString ollam_url = "http://localhost:11434/api/chat";
+    QString ollam_url = "http://127.0.0.1:6006/api/chat";
     QString  _receiving_txt= "";
     bool _success = true;
 private:

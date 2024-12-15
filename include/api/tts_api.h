@@ -112,7 +112,7 @@ private:
     bool isInit = false;
     QNetworkAccessManager *manager = nullptr;
 
-    QString tts_url = "http://localhost:11434/api/chat";
+    QString tts_url = "http://localhost:11434/api/chat"; ///
     bool _success = true;
 
 private:

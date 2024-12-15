@@ -174,8 +174,7 @@ void T_AnimationBubble::paintEvent(QPaintEvent *event)
     painter.setRenderHint(QPainter::Antialiasing);
 
     // 设置气泡背景颜色和透明度
-    QColor bubbleColor(180, 180, 180, 180); // 灰色，透明度为 180
-    painter.setBrush(bubbleColor);
+    painter.setBrush(m_bubbleColor);
     painter.setPen(Qt::NoPen);
 
     // 设置文本颜色和字体

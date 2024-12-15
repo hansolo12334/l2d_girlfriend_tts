@@ -12,6 +12,7 @@ int main(int argc,char **argv)
 {
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+
     if (event_handler::get_instance().initialize() == false)
     {
         return 0;

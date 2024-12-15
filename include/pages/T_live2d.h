@@ -26,8 +26,11 @@ public:
     QVBoxLayout *v_layout{nullptr};
     QHBoxLayout *h_layout{nullptr};
     HoverButton *open_dialogBt{nullptr};
-    dialogInputEdit *dialog_inpit{nullptr};
+    dialogInputEdit *dialog_input{nullptr};
     T_TransparentChatScrollArea *trans_chat_area{nullptr};
+
+    void resize(int w, int h);
+    void show();
 
 public:
     Q_SLOT void add_bubble_input_chat(QString text);
@@ -41,12 +44,20 @@ private:
     qreal dpiScale;
 
 
+    int last_window_height;
+    int last_window_width;
+    QPoint last_window_pos;
+    bool user_call_resize = false;
+
+
 protected:
     void closeEvent(QCloseEvent *e) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void customEvent(QEvent *e) override;
+
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     Q_SLOT void on_open_dialogBt_clicked();

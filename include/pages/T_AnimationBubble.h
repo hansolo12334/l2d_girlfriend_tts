@@ -55,6 +55,7 @@ private:
     //
     QString m_text;
     QColor m_textColor = Qt::black;
+    // 灰色，透明度为 180
     QColor m_bubbleColor{180, 180, 180, 180};
     int m_maxWidth = 200;
 };

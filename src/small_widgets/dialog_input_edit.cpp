@@ -58,7 +58,10 @@ dialogInputEdit::dialogInputEdit(QWidget *parent)
     _closeCurrentBt->setFixedWidth(60);
     _closeCurrentBt->setLightHoverColor(QColor(0xE8, 0x11, 0x23));
     _closeCurrentBt->autoFillBackground();
-    connect(_closeCurrentBt, &ElaIconButton::clicked, this, [=]() { this->hide(); });
+    connect(_closeCurrentBt, &ElaIconButton::clicked, this, [=]() {
+        this->hide();
+        emit hideChatScrollArea();
+    });
 
     _voiceInputBt = new ElaIconButton(ElaIconType::Phone);
     _voiceInputBt->setFixedHeight(60);
@@ -175,6 +178,9 @@ void dialogInputEdit::inputTextEvent()
     Ollama::OllamaAPI::instance().set_ollama_url(AppConfig::instance().getOllamaApiAddress());
 
     APP_LOG_DEBUG("ollama :"<<_inputLineEdt->text().simplified());
+    // char* pLocale = setlocale(LC_ALL, nullptr);
+    // printf("ttttt: %s\n", _inputLineEdt->text().simplified().toStdString().c_str());
+
     // ollama_request.model = "qwen2-rp";
     // ollama_request.stream = true;
 

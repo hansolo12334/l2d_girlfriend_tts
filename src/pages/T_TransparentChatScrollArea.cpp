@@ -53,7 +53,7 @@ T_TransparentChatScrollArea::T_TransparentChatScrollArea(QWidget *parent)
     // scrollArea->setStyleSheet("background-color:transparent;");
     // scrollAreaWidget->setStyleSheet("background-color:transparent;");
 
-    this->setStyleSheet("background-color:green;");
+    this->setStyleSheet("background-color:transparent;");
 
 
     vScrollBar = scrollArea->verticalScrollBar();

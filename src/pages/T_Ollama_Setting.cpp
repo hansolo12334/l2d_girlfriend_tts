@@ -94,7 +94,7 @@ T_Ollama_Setting::T_Ollama_Setting(QWidget *parent) : T_BasePage(parent)
 
 
     ElaLineEdit *api_address_edit = new ElaLineEdit(this);
-    api_address_edit->setText("http://localhost:11434/api/chat");
+    api_address_edit->setText(AppConfig::instance().getOllamaApiAddress());
     api_address_edit->setMaximumWidth(500);
     AppConfig::instance().setOllamaApiAddress(api_address_edit->text());
 
