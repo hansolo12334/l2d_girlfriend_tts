@@ -22,12 +22,18 @@ private:
     QPoint mouse_global_pos{0,0};
 
     QPointF _mouse_pos;
+    QPointF _mouse_start_pos;
+    QPointF _mouse_end_pos;
+    QPointF _offset_mouse_pos={0,0};
 
     bool outSideL2d = true;
     double scaleFactor = 1.0;
     bool control_key_pressed = false;
     int l2d_height = 0;
     int l2d_width=0;
+
+private:
+    float getAlpha(int x, int y);
 
 protected:
     void initializeGL();

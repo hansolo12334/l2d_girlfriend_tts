@@ -74,8 +74,7 @@ T_live2d::T_live2d(QWidget *parent)
 
     // this->setLayout(v_layout);
     this->resize(600, 420); // 150 450
-    last_window_height = 420;
-    last_window_width=600*3/4;
+
 
 
     int cxScreen,cyScreen;
@@ -94,7 +93,6 @@ T_live2d::T_live2d(QWidget *parent)
     if(this->x()*dpiScale+this->width()>cxScreen || this->y()*dpiScale+this->height()>cyScreen){
         APP_LOG_DEBUG("重新定位");
         this->move(cxScreen/dpiScale - this->width(), cyScreen/dpiScale - this->height()-40);
-        last_window_pos = this->pos();
     }
 
 
@@ -105,13 +103,11 @@ T_live2d::T_live2d(QWidget *parent)
     connect(dialog_input, &dialogInputEdit::responce_content, this, &T_live2d::add_bubble_resopence_chat);
     connect(dialog_input, &dialogInputEdit::hideChatScrollArea, this, [=]() {
         APP_LOG_DEBUG("隐藏聊天栏");
-        // h_layout->removeWidget(trans_chat_area);
         trans_chat_area->hide();
-
-        this->move(this->pos().x() + last_window_width / 3, this->pos().y());
-
-        this->resize(last_window_width, last_window_height);
-        last_window_pos = this->pos();
+        left_spacer = new QSpacerItem(trans_chat_area->width(),
+                                        trans_chat_area->height()
+                                        );
+        h_layout->insertItem(0, left_spacer);
     });
 }
 
@@ -184,7 +180,6 @@ void T_live2d::mouseMoveEvent(QMouseEvent *event)
 
         // this->move(event->pos() + this->pos() - curPos);
         this->move(resault_pos);
-        last_window_pos = this->pos();
         pos_x = x;
         pos_y = y;
 
@@ -203,30 +198,16 @@ void T_live2d::customEvent(QEvent* e)
 
 void T_live2d::resize(int w, int h)
 {
-    user_call_resize = true;
     QWidget::resize(w, h);
-    user_call_resize = false;
 }
 
 void T_live2d::show()
 {
-    // this->move(last_window_pos);
     QWidget::show();
 }
 
 void T_live2d::resizeEvent(QResizeEvent *event)
 {
-    if(!user_call_resize){
-        last_window_height = event->size().height();
-        if(trans_chat_area->isHidden()){//如果隐藏的话 宽度就是live2d宽度
-            last_window_width = event->size().width();
-            APP_LOG_DEBUG("宽度:" << last_window_width);
-        }else{//否则是宽度的3/4
-            last_window_width = event->size().width()*3/4;
-            APP_LOG_DEBUG("宽度:" << last_window_width);
-        }
-
-    }
     QWidget::resizeEvent(event);
 }
 
@@ -239,10 +220,10 @@ void T_live2d::on_open_dialogBt_clicked()
     dialog_input->show();
 
     if(trans_chat_area->isHidden()){
-        this->resize(last_window_width*4/3, last_window_height);
-        this->move(this->pos().x() -last_window_width / 3, this->pos().y());
-        last_window_pos = this->pos();
+        h_layout->removeItem(left_spacer);
         trans_chat_area->show();
+        delete left_spacer;
+        left_spacer = nullptr;
     }
 }
 

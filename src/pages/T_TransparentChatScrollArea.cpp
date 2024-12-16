@@ -68,6 +68,7 @@ T_TransparentChatScrollArea::T_TransparentChatScrollArea(QWidget *parent)
         hcrollBar->setValue(maxValue);
     });
 
+    // this->setWindowTransparent();
 }
 
 

@@ -160,12 +160,15 @@ void dialogInputEdit::inputTextEvent()
     // chatBubble->setWordWrap(false);
 
     // _mainLayout->addWidget(chatBubble);
-    APP_LOG_DEBUG("ollama asdasdasdasdasda");
     if (_inputLineEdt->text().isEmpty())
     {
         return;
     }
-    emit input_content(_inputLineEdt->text().simplified());
+    QString input_str = _inputLineEdt->text().simplified();
+
+
+    emit input_content(input_str);
+    _inputLineEdt->clear();
 
     // Ollama::OllamaRequest ollama_request;
 
@@ -177,7 +180,7 @@ void dialogInputEdit::inputTextEvent()
     Ollama::OllamaAPI::instance().set_stream(true);
     Ollama::OllamaAPI::instance().set_ollama_url(AppConfig::instance().getOllamaApiAddress());
 
-    APP_LOG_DEBUG("ollama :"<<_inputLineEdt->text().simplified());
+    APP_LOG_DEBUG("ollama :"<<input_str);
     // char* pLocale = setlocale(LC_ALL, nullptr);
     // printf("ttttt: %s\n", _inputLineEdt->text().simplified().toStdString().c_str());
 
@@ -190,7 +193,7 @@ void dialogInputEdit::inputTextEvent()
 
     // message_a.role = "assistant";
     // message_a.content = "亲爱的，我是你的性感女友，我会为了你做任何事情。";
-    Ollama::Ollama_messages message_u{"user", _inputLineEdt->text().simplified()};
+    Ollama::Ollama_messages message_u{"user", input_str};
 
     Ollama::OllamaAPI::instance().add_message(message_u);
     // message_u.role = "user";
@@ -248,7 +251,6 @@ void dialogInputEdit::inputTextEvent()
 
         });
     }
-    _inputLineEdt->clear();
 }
 
 

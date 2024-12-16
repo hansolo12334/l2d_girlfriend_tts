@@ -13,6 +13,8 @@
 #include <QPoint>
 #include <QPushButton>
 #include <QVBoxLayOut>
+#include<QSpacerItem>
+
 class T_live2d : public QWidget
 {
     Q_OBJECT
@@ -29,6 +31,8 @@ public:
     dialogInputEdit *dialog_input{nullptr};
     T_TransparentChatScrollArea *trans_chat_area{nullptr};
 
+    QSpacerItem *left_spacer{nullptr};
+
     void resize(int w, int h);
     void show();
 
@@ -44,10 +48,7 @@ private:
     qreal dpiScale;
 
 
-    int last_window_height;
-    int last_window_width;
-    QPoint last_window_pos;
-    bool user_call_resize = false;
+
 
 
 protected:

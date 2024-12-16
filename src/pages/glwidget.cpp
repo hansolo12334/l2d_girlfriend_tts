@@ -66,7 +66,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
     }
     // 获取滚轮滚动的角度
     int delta = event->angleDelta().y();
-
+    APP_LOG_DEBUG("delta " << delta);
     // 根据滚轮滚动的方向调整缩放因子
     if (delta > 0)
     {
@@ -76,20 +76,22 @@ void GLWidget::wheelEvent(QWheelEvent *event)
     {
         scaleFactor /= 1.01f; // 缩小
     }
-
-    // qDebug() << "l2d_width "<< l2d_width ;
-    // qDebug() << "scaleFactor " << scaleFactor;
+    // APP_LOG_DEBUG("resize: " << l2d_width * scaleFactor);
+    // this->resize(l2d_width * scaleFactor, l2d_height * scaleFactor);
     LAppView *view=LAppDelegate::GetInstance()->GetView();
 
 
     view->scale_user(l2d_width /2, l2d_height / 2, scaleFactor);
-    LAppDelegate::GetInstance()->resize(l2d_width, l2d_height);
+    LAppDelegate::GetInstance()->resize(this->width(), this->height());
 }
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
     // APP_LOG_DEBUG("key pressed!");
-    if(resource_loader::get_instance().moveable())
+
+
+
+    if (resource_loader::get_instance().moveable())
     {
         QApplication::sendEvent(this->parent(), event);
     }
@@ -139,13 +141,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
         default:
             break;
         }
-        // if(event->modifiers() ==Qt::ControlModifier)
-        // {
-        //     APP_LOG_DEBUG("ctrl release!");
-        // }
-        //qDebug("x:%d y:%d",x,y);
-        // APP_LOG_DEBUG("width1: " << this->window()->width() << " " << this->window()->height());
-        // LAppDelegate::GetInstance()->mousePressEvent(x, y);
     }
 }
 
@@ -171,8 +166,22 @@ void GLWidget::resizeGL(int width, int height)
     LAppDelegate::GetInstance()->resize(width, height);
 }
 
+
+float GLWidget::getAlpha(int x,int y)
+{
+    this->makeCurrent();
+    unsigned char pixel[4];
+    glReadPixels(x, this->height() - y - 1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
+    doneCurrent();
+    return pixel[3] / 255.0f;
+}
+
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
+
+    float alp = getAlpha(event->position().x(), event->position().y());
+    APP_LOG_DEBUG("color:==========> " << alp);
+
     if(resource_loader::get_instance().moveable())
     {
         QApplication::sendEvent(this->parent(), event);
@@ -188,7 +197,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     }
     else{
         _mouse_pos=event->position();
-
+        _mouse_start_pos = _mouse_pos;
     }
 }
 
@@ -207,7 +216,11 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
         // APP_LOG_DEBUG("release" << x << " " << y);
         LAppDelegate::GetInstance()->mouseReleaseEvent(x,y);
     }
-
+    else{
+        // _mouse_end_pos = _mouse_pos;
+        // _offset_mouse_pos = _mouse_start_pos - _mouse_end_pos;
+        APP_LOG_DEBUG("偏移: " << _offset_mouse_pos);
+    }
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
